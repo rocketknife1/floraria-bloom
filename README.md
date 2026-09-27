@@ -1,6 +1,6 @@
-# Florăria Bloom Petro•••••
+# Florăria Bloom Petroșani
 
-Site de prezentare pentru Florăria Bloom din Petro•••••: buchete, cutii și coșuri cu flori, cu comandă rapidă pe WhatsApp.
+Site de prezentare pentru Florăria Bloom din Petroșani: buchete, cutii și coșuri cu flori, cu comandă rapidă pe WhatsApp.
 
 ## 🔗 Site live
 
@@ -8,12 +8,14 @@ Site de prezentare pentru Florăria Bloom din Petro•••••: buchete, cut
 
 ## Ce conține
 
-- „Povești” din florărie în stil Instagram: cercuri pe care le apeși și le răsfoiești pe tot ecranul
-- Galerie de lucrări reale, pe rânduri orizontale (buchete, cutii, coșuri), cu vizualizare mărită
-- **Livrare la domiciliu cu mașina florăriei**: o dubiță merge pe drum pe măsură ce derulezi și aprinde zonele de livrare, plus un contor real până la ora limită pentru livrarea în aceeași zi
-- Program cu stare live („Deschis acum” / „Închis”) și ziua de azi evidențiată
-- Formular de comandă care deschide WhatsApp cu mesajul gata scris, cu opțiunea „Ridic din florărie” sau „Livrare acasă” (zonă, adresă, interval orar)
-- Animații: pozele „înfloresc” la intrare, iar conținutul se mărește când ajunge în centrul ecranului
+- **Hartă 3D reală a Văii Jiului** (străzi, blocuri și munți): alegi localitatea, iar mașina florăriei pleacă din fața magazinului și merge pe traseul real până acolo, cu prețul transportului afișat la sosire
+- Drum animat la scroll, cu localitățile din Valea Jiului și prețurile de livrare
+- „Povești” în stil Instagram, cu pauză (buton sau o atingere pe ecran) și glisare stânga/dreapta
+- Galerie de lucrări reale, pe rânduri orizontale (buchete, cutii, coșuri)
+- Accesorii din florărie: ghivece, foi pentru buchete, panglici, suporturi pentru plante, suporți, ornamente
+- Camera plantelor: temperaturi și umiditate pe tipuri de plante, cu termometru interactiv
+- Program cu stare live („Deschis acum” / „Închis”), hartă Google cu adresa
+- Formular de comandă pe WhatsApp, cu „Ridic din florărie” sau „Livrare acasă” (localitate, adresă, interval)
 - Responsive, cu bară de contact rapid pe mobil; respectă setarea „reduce motion”
 - Politică de confidențialitate, linkuri ANPC / SAL, date structurate schema.org (`Florist`)
 
@@ -21,9 +23,15 @@ Site de prezentare pentru Florăria Bloom din Petro•••••: buchete, cut
 
 Toate se schimbă dintr-un singur loc: obiectul `CONFIG` de la începutul lui `js/main.js`.
 Valorile de acum sunt **orientative** și apar pe site cu mențiunea „de confirmat” cât timp `draft: true`.
-Când completezi `mapsQuery` cu adresa completă, apare automat harta Google.
 
-Datele de contact (oraș, telefon) sunt momentan ascunse parțial.
+Numărul de telefon este momentan ascuns parțial.
+
+## Harta 3D
+
+- Bibliotecă: [MapLibre GL JS](https://maplibre.org/) (încărcată doar când vizitatorul ajunge la hartă)
+- Hartă: [OpenFreeMap](https://openfreemap.org/), date © OpenStreetMap contributors, fără cheie API
+- Relief: [AWS Terrain Tiles](https://registry.opendata.aws/terrain-tiles/), fără cheie API
+- Traseele reale sunt precalculate în `js/routes.js` (OSRM), deci site-ul nu depinde de un serviciu de rutare. Dacă florăria se mută, traseele trebuie regenerate.
 
 ## Tehnologii
 

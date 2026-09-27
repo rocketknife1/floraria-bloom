@@ -3,11 +3,12 @@
    * CONFIG: tot ce ține de program și livrare se schimbă doar aici.
    * Valorile sunt ORIENTATIVE până le confirmă florăria (draft: true
    * afișează pe site mențiunea „de confirmat”).
+   * km / min vin din traseele reale din js/routes.js.
    * ------------------------------------------------------------------ */
   const CONFIG = {
     draft: true,
     phoneWa: "", // ex. "40723123456"; gol = WhatsApp fără număr precompletat
-    mapsQuery: "", // ex. "Florăria Bloom, Str. 1 Decembrie 1918, bl. 65, <oraș>"; completat = hartă Google încorporată
+    mapsQuery: "Florăria Bloom, Strada 1 Decembrie 1918, bl. 65, Petroșani",
     // 0 = duminică … 6 = sâmbătă; null = închis
     hours: {
       1: ["09:00", "19:00"],
@@ -23,11 +24,13 @@
       sameDayCutoff: "15:00",
       freeOverLei: 250,
       zones: [
-        { id: "ridicare", name: "Ridici din florărie", price: 0, time: "gata în 1–2 ore", pickup: true },
-        { id: "oras", name: "În oraș", price: 15, time: "în aceeași zi" },
-        { id: "cartiere", name: "Cartierele mărginașe", price: 20, time: "în aceeași zi" },
-        { id: "15km", name: "Localități vecine, până la 15 km", price: 30, time: "în aceeași zi sau a doua zi" },
-        { id: "30km", name: "Până la 30 km", price: 45, time: "a doua zi" },
+        { id: "ridicare", name: "Ridici din florărie", short: "Florăria", price: 0, time: "gata în 1–2 ore", pickup: true },
+        { id: "petrosani", name: "Petroșani", price: 15, time: "în aceeași zi", km: 4, min: 6 },
+        { id: "petrila", name: "Petrila", price: 25, time: "în aceeași zi", km: 5.9, min: 9 },
+        { id: "aninoasa", name: "Aninoasa", price: 25, time: "în aceeași zi", km: 7, min: 12 },
+        { id: "vulcan", name: "Vulcan", price: 30, time: "în aceeași zi", km: 12.2, min: 19 },
+        { id: "lupeni", name: "Lupeni", price: 35, time: "în aceeași zi", km: 18.7, min: 30 },
+        { id: "uricani", name: "Uricani", price: 45, time: "în aceeași zi sau a doua zi", km: 28.2, min: 44 },
       ],
     },
   };
@@ -41,6 +44,34 @@
     { src: "img/cutie-galbena-gerbera.jpg", bg: "#4f3d20", label: "Soare", title: "Cutie cu gerbera galbene", text: "Gerbera, lisianthus și spice de grâu, pentru o zi luminoasă.", type: "cutie" },
     { src: "img/buchet-trandafiri-albi.jpg", bg: "#3e3631", label: "Alb pur", title: "Buchet de trandafiri albi", text: "Trandafiri albi cu verdeață, în hârtie verde-salvie.", type: "buchet" },
     { src: "img/cutie-roz-bujori.jpg", bg: "#492630", label: "Bujori", title: "Cutie cu bujori și trandafiri", text: "Bujor, trandafiri vișinii și flori albe, cu panglici.", type: "cutie" },
+  ];
+
+  // Plant room: typical ranges per plant type
+  const CLIMATE = [
+    {
+      id: "tropicale", tab: "Orhidee și tropicale", img: "img/zona-orhidee.jpg", alt: "Orhidee mov într-un ghiveci alb",
+      title: "Zona caldă, pentru orhidee și plante tropicale",
+      text: "Orhideele, anthurium și alte plante tropicale stau în zona încălzită, ferite de curenți, cu umiditate ridicată și lumină filtrată.",
+      min: 20, max: 24, hum: "60–70%", light: "difuză",
+    },
+    {
+      id: "flori", tab: "Flori tăiate", img: "img/trandafiri-rosii.jpg", alt: "Trandafiri roșii proaspăt tăiați",
+      title: "Răcoare pentru florile tăiate",
+      text: "Trandafirii, lisianthus și gerbera așteaptă la rece, în apă proaspătă, ca să rămână închiși și fermi până îi compunem în buchet.",
+      min: 2, max: 6, hum: "85–90%", light: "slabă",
+    },
+    {
+      id: "suculente", tab: "Suculente și cactuși", img: "img/zona-suculente.jpg", alt: "Suculente în ghivece de lut, văzute de sus",
+      title: "Căldură uscată pentru suculente",
+      text: "Suculentele și cactușii primesc multă lumină, aer mai uscat și căldură constantă, ca să rămână compacte și colorate.",
+      min: 18, max: 26, hum: "30–40%", light: "puternică",
+    },
+    {
+      id: "verzi", tab: "Plante verzi", img: "img/zona-verzi.jpg", alt: "Palmier și plante verzi în ghivece",
+      title: "Echilibru pentru plantele verzi de interior",
+      text: "Ficus, monstera, palmieri: temperatură stabilă și căldură distribuită uniform, ca frunzele să crească egal pe toate părțile.",
+      min: 18, max: 24, hum: "50–60%", light: "medie",
+    },
   ];
 
   const TYPE_LABEL = { buchet: "Buchet", cutie: "Cutie cu flori", cos: "Coș cu flori" };
@@ -58,6 +89,7 @@
   };
   const draftTag = () => (CONFIG.draft ? ' <span class="draft">de confirmat</span>' : "");
   const lei = (n) => (n === 0 ? "gratuit" : `${n} lei`);
+  const km = (n) => `${String(n).replace(".", ",")} km`;
 
   /* Header + menu */
   const header = $(".site-header");
@@ -117,31 +149,31 @@
         .join("");
   }
 
-  /* Map: embedded only once a full address is published */
-  const map = $("[data-map]");
-  if (map && CONFIG.mapsQuery) {
+  /* Google map with the shop address */
+  const mapCard = $("[data-map]");
+  if (mapCard && CONFIG.mapsQuery) {
     const q = encodeURIComponent(CONFIG.mapsQuery);
-    map.innerHTML = `<iframe title="Harta: Florăria Bloom" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=${q}&output=embed"></iframe>
+    mapCard.innerHTML = `<iframe title="Harta: Florăria Bloom Petroșani" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=${q}&output=embed"></iframe>
       <a class="btn btn-primary map-open" href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener">Deschide în Google Maps</a>`;
   }
 
-  /* Delivery zones: list, map pins, form select */
+  /* Delivery zones: cards, road stops, form select */
   const zones = CONFIG.delivery.zones;
   $("[data-zones]").innerHTML = zones
     .map(
       (z, i) => `<li data-zone="${i}">
-        <span class="zone-num">${i + 1}</span>
         <span class="zone-name">${z.name}</span>
         <span class="zone-price">${lei(z.price)}</span>
-        <span class="zone-time">${z.time}</span>
+        <span class="zone-time">${z.km ? `${km(z.km)} · ~${z.min} min · ` : ""}${z.time}</span>
       </li>`,
     )
     .join("");
   $("[data-zones-note]").innerHTML =
-    `Livrare gratuită în oraș pentru comenzile de peste ${CONFIG.delivery.freeOverLei} lei. Livrăm de ${DAYS[CONFIG.delivery.days[0]]} până ${DAYS[CONFIG.delivery.days.at(-1)]}.` +
+    `Livrare gratuită în Petroșani pentru comenzile de peste ${CONFIG.delivery.freeOverLei} lei. Livrăm de ${DAYS[CONFIG.delivery.days[0]]} până ${DAYS[CONFIG.delivery.days.at(-1)]}. Distanțele sunt pe drum, din fața florăriei.` +
     draftTag();
 
-  $("[data-zone-select]").innerHTML = zones
+  const zoneSelect = $("[data-zone-select]");
+  zoneSelect.innerHTML = zones
     .filter((z) => !z.pickup)
     .map((z) => `<option value="${z.name}">${z.name} (${lei(z.price)})</option>`)
     .join("");
@@ -226,6 +258,51 @@
     if (e.key === "ArrowRight") show(current + 1);
   });
 
+  /* Plant room climate tabs */
+  const climate = $("[data-climate]");
+  if (climate) {
+    const tabs = $("[data-climate-tabs]");
+    tabs.innerHTML = CLIMATE.map(
+      (c, i) => `<button type="button" role="tab" id="tab-${c.id}" aria-controls="climate-panel" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-climate-id="${c.id}">${c.tab}</button>`,
+    ).join("");
+    const panel = $("[data-climate-panel]");
+    const band = $("[data-thermo-band]");
+    const selectClimate = (id, focus = false) => {
+      const c = CLIMATE.find((x) => x.id === id);
+      $$("[role=tab]", tabs).forEach((t) => {
+        const on = t.dataset.climateId === id;
+        t.setAttribute("aria-selected", String(on));
+        t.tabIndex = on ? 0 : -1;
+        if (on && focus) t.focus();
+      });
+      panel.setAttribute("aria-labelledby", `tab-${id}`);
+      const img = $("[data-climate-img]");
+      img.src = c.img;
+      img.alt = c.alt;
+      $("[data-climate-title]").textContent = c.title;
+      $("[data-climate-text]").textContent = c.text;
+      $("[data-climate-temp]").textContent = `${c.min}–${c.max} °C`;
+      $("[data-climate-hum]").textContent = c.hum;
+      $("[data-climate-light]").textContent = c.light;
+      band.style.left = `${(c.min / 30) * 100}%`;
+      band.style.width = `${((c.max - c.min) / 30) * 100}%`;
+      panel.classList.remove("swap");
+      void panel.offsetWidth;
+      panel.classList.add("swap");
+    };
+    tabs.addEventListener("click", (e) => {
+      const t = e.target.closest("[data-climate-id]");
+      if (t) selectClimate(t.dataset.climateId);
+    });
+    tabs.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      const idx = CLIMATE.findIndex((c) => c.id === $("[aria-selected=true]", tabs).dataset.climateId);
+      const n = (idx + (e.key === "ArrowRight" ? 1 : -1) + CLIMATE.length) % CLIMATE.length;
+      selectClimate(CLIMATE[n].id, true);
+    });
+    selectClimate(CLIMATE[0].id);
+  }
+
   /* Order form */
   const form = $("#order-form");
   const tip = $("#f-tip");
@@ -250,12 +327,11 @@
       dataHint.hidden = false;
     }
   }
-  $$('input[name="predare"]').forEach((r) =>
-    r.addEventListener("change", () => {
-      deliveryFields.hidden = !isDelivery();
-      updateDateHint();
-    }),
-  );
+  const syncDelivery = () => {
+    deliveryFields.hidden = !isDelivery();
+    updateDateHint();
+  };
+  $$('input[name="predare"]').forEach((r) => r.addEventListener("change", syncDelivery));
   data.addEventListener("change", updateDateHint);
 
   function prefill(item, type) {
@@ -265,6 +341,15 @@
     setTimeout(() => $("#f-nume").focus({ preventScroll: true }), 500);
   }
   $$(".ask").forEach((a) => a.addEventListener("click", () => prefill(a.dataset.item, a.closest("li").dataset.type)));
+
+  // "Comandă cu livrare aici" from the 3D map
+  function orderTo(zone) {
+    form.elements.predare.value = "livrare";
+    $('input[name="predare"][value="livrare"]').checked = true;
+    syncDelivery();
+    zoneSelect.value = zone.name;
+    setTimeout(() => adresa.focus({ preventScroll: true }), 600);
+  }
 
   const checks = [
     { el: $("#f-nume"), ok: (v) => v.trim().length >= 2 },
@@ -315,10 +400,12 @@
 
   /* Stories viewer (Instagram-style) */
   const story = $("#story");
+  const storyFrame = $("#story-frame");
   const storyImg = $("#story-img");
   const storyBlur = $("#story-blur");
+  const pauseBtn = $("#story-pause");
   const bars = $("#story-bars");
-  const DURATION = 5000;
+  const DURATION = 6000;
   let sIndex = 0;
   let sStart = 0;
   let sElapsed = 0;
@@ -328,6 +415,12 @@
   bars.innerHTML = STORIES.map(() => '<span class="story-bar"><i></i></span>').join("");
   const barFills = $$(".story-bar i", bars);
 
+  function setPaused(p) {
+    sPaused = p;
+    storyFrame.classList.toggle("is-paused", p);
+    pauseBtn.setAttribute("aria-pressed", String(p));
+    pauseBtn.setAttribute("aria-label", p ? "Continuă" : "Pune pauză");
+  }
   function loadStory() {
     const s = STORIES[sIndex];
     storyImg.src = s.src;
@@ -345,6 +438,7 @@
   }
   function openStory(i) {
     sIndex = i;
+    setPaused(reduceMotion);
     story.showModal();
     loadStory();
     cancelAnimationFrame(sFrame);
@@ -359,7 +453,7 @@
   }
   function tickStory(now) {
     if (!story.open) return;
-    if (sPaused || reduceMotion) {
+    if (sPaused) {
       sStart = now - sElapsed;
     } else {
       sElapsed = now - sStart;
@@ -373,15 +467,27 @@
   $("#story-prev").addEventListener("click", () => stepStory(-1));
   $("#story-next").addEventListener("click", () => stepStory(1));
   $("#story-close").addEventListener("click", () => story.close());
+  pauseBtn.addEventListener("click", () => setPaused(!sPaused));
   story.addEventListener("click", (e) => { if (e.target === story) story.close(); });
   story.addEventListener("keydown", (e) => {
     if (e.key === "ArrowLeft") stepStory(-1);
     if (e.key === "ArrowRight") stepStory(1);
+    if (e.key === " " || e.key === "k") { e.preventDefault(); setPaused(!sPaused); }
   });
-  // Press and hold pauses, like on Instagram
-  const frame = $(".story-frame");
-  frame.addEventListener("pointerdown", () => { sPaused = true; });
-  ["pointerup", "pointercancel", "pointerleave"].forEach((ev) => frame.addEventListener(ev, () => { sPaused = false; }));
+  // One tap on the story pauses / resumes; a horizontal swipe changes the story
+  let down = null;
+  storyFrame.addEventListener("pointerdown", (e) => {
+    if (e.target.closest("button, a")) { down = null; return; }
+    down = { x: e.clientX, y: e.clientY };
+  });
+  storyFrame.addEventListener("pointerup", (e) => {
+    if (!down) return;
+    const dx = e.clientX - down.x;
+    const dy = e.clientY - down.y;
+    down = null;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) stepStory(dx < 0 ? 1 : -1);
+    else if (Math.abs(dx) < 10 && Math.abs(dy) < 10) setPaused(!sPaused);
+  });
   $("#story-cta").addEventListener("click", () => {
     const s = STORIES[sIndex];
     story.close();
@@ -389,7 +495,7 @@
   });
   story.addEventListener("close", () => cancelAnimationFrame(sFrame));
 
-  /* Delivery road: pins along the path, van placed by progress */
+  /* Delivery road: town names along the path, van placed by progress */
   const road = $("#road");
   const roadDone = $("#road-done");
   const van = $("#van");
@@ -400,7 +506,11 @@
   $("[data-stops]").innerHTML = stopsAt
     .map((f, i) => {
       const pt = road.getPointAtLength(f * total);
-      return `<g class="stop" transform="translate(${pt.x.toFixed(1)} ${pt.y.toFixed(1)})"><circle r="17"/><text y="5" text-anchor="middle">${i + 1}</text></g>`;
+      const below = i % 2 === 1;
+      const name = zones[i].short ?? zones[i].name;
+      return `<g class="stop" transform="translate(${pt.x.toFixed(1)} ${pt.y.toFixed(1)})">
+        <circle r="11"/>
+        <text class="stop-label" y="${below ? 40 : -24}" text-anchor="middle">${name}</text></g>`;
     })
     .join("");
   const stopEls = $$(".stop");
@@ -425,6 +535,55 @@
     });
   }
 
+  /* Real 3D map: loaded only when the visitor gets close to it */
+  const mapRoot = $("[data-map3d]");
+  const MAPLIBRE = "https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl";
+  const loadScript = (src) =>
+    new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.append(s);
+    });
+  async function startMap() {
+    const css = document.createElement("link");
+    css.rel = "stylesheet";
+    css.href = `${MAPLIBRE}.css`;
+    document.head.append(css);
+    try {
+      await Promise.all([loadScript(`${MAPLIBRE}.js`), loadScript("js/routes.js?v=8")]);
+      await loadScript("js/map3d.js?v=8");
+      window.initBloomMap({
+        container: $("#map3d"),
+        root: mapRoot,
+        zones,
+        routes: window.BLOOM_ROUTES,
+        reduceMotion,
+        draftTag,
+        onOrder: (zone) => {
+          orderTo(zone);
+          $("#comanda").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+        },
+      });
+    } catch (err) {
+      console.error("Harta 3D nu s-a putut încărca", err);
+      mapRoot.classList.add("map3d-failed");
+    }
+  }
+  if (mapRoot) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          io.disconnect();
+          startMap();
+        }
+      },
+      { rootMargin: "700px 0px" },
+    );
+    io.observe(mapRoot);
+  }
+
   /* Scroll motion ------------------------------------------------------ */
   if (reduceMotion) {
     placeVan(1);
@@ -434,6 +593,8 @@
   const hero = $(".hero");
   const card = $(".hero-card");
   const delivery = $(".delivery");
+  const greenroom = $(".greenroom");
+  const greenImg = $(".greenroom-media img");
   const petals = $$(".petal").map((el, i) => ({
     el,
     side: el.matches(".p4, .p5, .p6") ? 1 : -1,
@@ -445,7 +606,7 @@
 
   document.documentElement.classList.add("js-focus");
   const focusEls = $$(
-    ".section-head, .stories-head, .stories, .rail-head, .rail-track .zoom, .world, .worlds-text, .steps li, .drive-head, .order-intro, .order-form, .contact-info, .map",
+    ".section-head, .stories-head, .stories, .rail-head, .rail-track .zoom, .world, .worlds-text, .bento > li, .greenroom-intro, .climate, .steps li, .drive-head, .map3d-head, .order-intro, .order-form, .contact-info, .map",
   );
   focusEls.forEach((el) => el.classList.add("focus"));
   const pinnedQuery = matchMedia("(min-width: 1001px) and (min-height: 700px)");
@@ -473,6 +634,13 @@
       const e = t * t * (3 - 2 * t);
       el.style.setProperty("--s", (1.03 - e * 0.11).toFixed(4));
       el.style.setProperty("--o", (1 - e * 0.45).toFixed(3));
+    }
+
+    // Plant room photo slowly settles from a close-up as the section scrolls by
+    const g = greenroom.getBoundingClientRect();
+    if (g.bottom > 0 && g.top < vh) {
+      const gp = clamp((vh - g.top) / (vh + g.height), 0, 1);
+      greenImg.style.transform = `scale(${(1.22 - gp * 0.22).toFixed(4)}) translateY(${((gp - 0.5) * -40).toFixed(1)}px)`;
     }
 
     // The van drives while the delivery scene is pinned (desktop) or passes through the viewport (mobile)
