@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Florăria Bloom Petro••••• | Buchete, cutii și coșuri cu flori</title>
-  <meta name="description" content="Florăria Bloom din Petro•••••: buchete, cutii și coșuri cu flori compuse de mână, la comandă. Str. 1 Decembrie 1918, bl. 65, parter. Comenzi la 0723 ••• •••.">
+  <title>Florăria Bloom Petro••••• | Buchete, cutii și coșuri cu flori, livrare la domiciliu</title>
+  <meta name="description" content="Florăria Bloom din Petro•••••: buchete, cutii și coșuri cu flori compuse de mână, la comandă, cu livrare la domiciliu cu mașina florăriei. Str. 1 Decembrie 1918, bl. 65, parter.">
   <meta name="theme-color" content="#E4DDEE">
 
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ro_RO">
   <meta property="og:site_name" content="Florăria Bloom">
   <meta property="og:title" content="Florăria Bloom Petro••••• | o floare, un zâmbet">
-  <meta property="og:description" content="Buchete, cutii și coșuri cu flori compuse de mână în Petro•••••. Comenzi la 0723 ••• •••.">
+  <meta property="og:description" content="Buchete, cutii și coșuri cu flori compuse de mână, ridicate din florărie sau livrate acasă cu mașina noastră.">
   <meta property="og:image" content="img/bloom-coperta.jpg">
 
   <link rel="icon" href="img/lotus.svg" type="image/svg+xml">
@@ -26,7 +26,7 @@
     "@type": "Florist",
     "name": "Florăria Bloom Petro•••••",
     "slogan": "o floare, un zâmbet",
-    "description": "Flori, buchete și aranjamente florale compuse de mână, la comandă.",
+    "description": "Flori, buchete și aranjamente florale compuse de mână, la comandă, cu livrare la domiciliu.",
     "image": "img/bloom-coperta.jpg",
     "telephone": "+40 723 ••• •••",
     "address": {
@@ -55,15 +55,16 @@
       </button>
       <nav id="meniu" class="nav" aria-label="Navigare principală">
         <a href="#flori">Flori</a>
-        <a href="#cum-comanzi">Cum comanzi</a>
+        <a href="#livrare">Livrare</a>
         <a href="#comanda">Comandă</a>
-        <a href="#contact">Contact</a>
+        <a href="#contact">Florăria</a>
         <a class="nav-call" href="#contact">0723 <span class="redact" aria-hidden="true">000 000</span></a>
       </nav>
     </div>
   </header>
 
   <main id="continut">
+    <!-- Hero -->
     <section class="hero" id="top" aria-labelledby="hero-titlu">
       <div class="hero-petals" aria-hidden="true">
         <img class="petal p1" src="img/cos-hortensie-roz.jpg" alt="" width="472" height="590">
@@ -78,113 +79,165 @@
         <img class="hero-lotus" src="img/lotus.svg" alt="" width="84" height="63">
         <h1 id="hero-titlu">Florăria Bloom</h1>
         <p class="tagline">o floare, un zâmbet</p>
-        <p class="hero-lead">Buchete, cutii și coșuri cu flori, compuse de mână în Petro<span class="redact" aria-hidden="true">ooooo</span> pentru fiecare ocazie.</p>
+        <p class="status" data-status hidden></p>
+        <p class="hero-lead">Buchete, cutii și coșuri cu flori, compuse de mână în Petro<span class="redact" aria-hidden="true">ooooo</span>. Le ridici din florărie sau ți le aducem acasă cu mașina noastră.</p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#comanda">Comandă flori</a>
-          <a class="btn btn-ghost" href="#contact">Sună: 0723 <span class="redact" aria-hidden="true">000 000</span></a>
+          <a class="btn btn-ghost" href="#livrare">Vezi livrarea</a>
         </div>
       </div>
+
+      <a class="scroll-cue" href="#povesti" aria-label="Derulează la buchetele săptămânii"><span></span></a>
     </section>
 
     <section class="facts" aria-label="Pe scurt">
       <div class="wrap facts-inner">
         <p><strong>Ne găsești</strong> pe Str. 1 Decembrie 1918, bl. 65, parter, Petro<span class="redact" aria-hidden="true">ooooo</span></p>
+        <p><strong>Livrăm cu mașina noastră</strong> în oraș și în împrejurimi, <a href="#livrare">vezi zonele</a></p>
         <p><strong>Comenzi</strong> la telefon sau pe WhatsApp: <a href="#contact">0723 <span class="redact" aria-hidden="true">000 000</span></a></p>
         <p><strong>2.300+ oameni</strong> ne urmăresc lucrările pe <a href="#contact">Facebook</a></p>
       </div>
     </section>
 
-    <section class="section" id="flori" aria-labelledby="flori-titlu">
+    <!-- Stories -->
+    <section class="stories-section" id="povesti" aria-labelledby="povesti-titlu">
+      <div class="wrap">
+        <div class="stories-head">
+          <h2 id="povesti-titlu">Din florărie, săptămâna asta</h2>
+          <p>Apasă pe un cerc și răsfoiește lucrările ca pe Instagram.</p>
+        </div>
+        <ul class="stories" aria-label="Povești din florărie">
+          <li><button type="button" class="story-ring" data-story="0"><img src="img/buchet-culori-calde.jpg" alt="" width="472" height="590" loading="lazy"><span>Apus</span></button></li>
+          <li><button type="button" class="story-ring" data-story="1"><img src="img/trandafiri-rosii.jpg" alt="" width="540" height="720" loading="lazy"><span>Clasic</span></button></li>
+          <li><button type="button" class="story-ring" data-story="2"><img src="img/cutie-rosie-gerbera.jpg" alt="" width="472" height="590" loading="lazy"><span>Pasiune</span></button></li>
+          <li><button type="button" class="story-ring" data-story="3"><img src="img/buchet-hortensie-albastra.jpg" alt="" width="472" height="590" loading="lazy"><span>Albastru</span></button></li>
+          <li><button type="button" class="story-ring" data-story="4"><img src="img/cos-bujori-piersica.jpg" alt="" width="472" height="590" loading="lazy"><span>Piersică</span></button></li>
+          <li><button type="button" class="story-ring" data-story="5"><img src="img/cutie-galbena-gerbera.jpg" alt="" width="472" height="590" loading="lazy"><span>Soare</span></button></li>
+          <li><button type="button" class="story-ring" data-story="6"><img src="img/buchet-trandafiri-albi.jpg" alt="" width="472" height="590" loading="lazy"><span>Alb pur</span></button></li>
+          <li><button type="button" class="story-ring" data-story="7"><img src="img/cutie-roz-bujori.jpg" alt="" width="472" height="590" loading="lazy"><span>Bujori</span></button></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Gallery rails -->
+    <section class="section section-flush" id="flori" aria-labelledby="flori-titlu">
       <div class="wrap">
         <div class="section-head">
           <h2 id="flori-titlu">Ce compunem pentru tine</h2>
           <p>Fiecare aranjament se face la comandă, așa că florile și culorile se pot schimba după gustul tău și după ce e proaspăt în florărie. Pozele sunt lucrări reale ale noastre.</p>
         </div>
+      </div>
 
-        <div class="filters" role="group" aria-label="Filtrează după tip">
-          <button type="button" class="chip" data-filter="toate" aria-pressed="true">Toate</button>
-          <button type="button" class="chip" data-filter="buchet" aria-pressed="false">Buchete</button>
-          <button type="button" class="chip" data-filter="cutie" aria-pressed="false">Cutii cu flori</button>
-          <button type="button" class="chip" data-filter="cos" aria-pressed="false">Coșuri cu flori</button>
+      <div class="rail" data-rail>
+        <div class="wrap rail-head">
+          <h3>Buchete</h3>
+          <div class="rail-nav">
+            <button type="button" class="rail-btn" data-dir="-1" aria-label="Buchete: înapoi">‹</button>
+            <button type="button" class="rail-btn" data-dir="1" aria-label="Buchete: înainte">›</button>
+          </div>
         </div>
-
-        <ul class="gallery" id="galerie">
+        <ul class="rail-track" aria-label="Buchete">
           <li data-type="buchet">
             <figure>
               <button type="button" class="zoom" aria-label="Mărește: Buchet în culori calde"><img src="img/buchet-culori-calde.jpg" alt="Buchet cu trandafiri portocalii și galbeni, crizanteme și eucalipt, în hârtie aurie" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Buchet în culori calde</span><span class="item-desc">Trandafiri portocalii și galbeni, crizanteme, eucalipt</span><a class="ask" data-item="Buchet în culori calde" href="#comanda">Întreabă de preț</a></figcaption>
+              <figcaption><span class="item-name">Buchet în culori calde</span><span class="item-desc">Trandafiri portocalii și galbeni, crizanteme, eucalipt</span><a class="ask" data-item="Buchet în culori calde" href="#comanda">Vreau unul asemănător</a></figcaption>
             </figure>
           </li>
           <li data-type="buchet">
             <figure>
               <button type="button" class="zoom" aria-label="Mărește: Buchet cu hortensie albastră"><img src="img/buchet-hortensie-albastra.jpg" alt="Buchet cu hortensie albastră, trandafiri roșii și roz, lisianthus mov, în hârtie roșie" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Buchet cu hortensie albastră</span><span class="item-desc">Hortensie, trandafiri, lisianthus mov</span><a class="ask" data-item="Buchet cu hortensie albastră" href="#comanda">Întreabă de preț</a></figcaption>
+              <figcaption><span class="item-name">Buchet cu hortensie albastră</span><span class="item-desc">Hortensie, trandafiri, lisianthus mov</span><a class="ask" data-item="Buchet cu hortensie albastră" href="#comanda">Vreau unul asemănător</a></figcaption>
             </figure>
           </li>
           <li data-type="buchet">
             <figure>
               <button type="button" class="zoom" aria-label="Mărește: Buchet de trandafiri albi"><img src="img/buchet-trandafiri-albi.jpg" alt="Buchet de trandafiri albi cu verdeață, ținut în mână" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Buchet de trandafiri albi</span><span class="item-desc">Trandafiri albi, verdeață, hârtie verde-salvie</span><a class="ask" data-item="Buchet de trandafiri albi" href="#comanda">Întreabă de preț</a></figcaption>
+              <figcaption><span class="item-name">Buchet de trandafiri albi</span><span class="item-desc">Trandafiri albi, verdeață, hârtie verde-salvie</span><a class="ask" data-item="Buchet de trandafiri albi" href="#comanda">Vreau unul asemănător</a></figcaption>
             </figure>
           </li>
           <li data-type="buchet">
             <figure>
               <button type="button" class="zoom" aria-label="Mărește: Buchet alb cu crizanteme"><img src="img/buchet-alb-crizanteme.jpg" alt="Buchet alb cu trandafiri, crizanteme și margarete" loading="lazy" width="526" height="589"></button>
-              <figcaption><span class="item-name">Buchet alb cu crizanteme</span><span class="item-desc">Trandafiri, crizanteme, margarete</span><a class="ask" data-item="Buchet alb cu crizanteme" href="#comanda">Întreabă de preț</a></figcaption>
+              <figcaption><span class="item-name">Buchet alb cu crizanteme</span><span class="item-desc">Trandafiri, crizanteme, margarete</span><a class="ask" data-item="Buchet alb cu crizanteme" href="#comanda">Vreau unul asemănător</a></figcaption>
             </figure>
           </li>
           <li data-type="buchet">
             <figure>
               <button type="button" class="zoom" aria-label="Mărește: Trandafiri roșii"><img src="img/trandafiri-rosii.jpg" alt="Buchet de trandafiri roșii, fotografiat de aproape" loading="lazy" width="540" height="720"></button>
-              <figcaption><span class="item-name">Trandafiri roșii</span><span class="item-desc">Clasicul care nu dă greș</span><a class="ask" data-item="Buchet de trandafiri roșii" href="#comanda">Întreabă de preț</a></figcaption>
+              <figcaption><span class="item-name">Trandafiri roșii</span><span class="item-desc">Clasicul care nu dă greș</span><a class="ask" data-item="Buchet de trandafiri roșii" href="#comanda">Vreau unul asemănător</a></figcaption>
             </figure>
           </li>
+        </ul>
+      </div>
+
+      <div class="rail" data-rail>
+        <div class="wrap rail-head">
+          <h3>Cutii cu flori</h3>
+          <div class="rail-nav">
+            <button type="button" class="rail-btn" data-dir="-1" aria-label="Cutii: înapoi">‹</button>
+            <button type="button" class="rail-btn" data-dir="1" aria-label="Cutii: înainte">›</button>
+          </div>
+        </div>
+        <ul class="rail-track" aria-label="Cutii cu flori">
           <li data-type="cutie">
             <figure>
-              <button type="button" class="zoom" aria-label="Mărește: Cutie roz cu gerbera și bujori"><img src="img/cutie-gerbera-roz.jpg" alt="Cutie albă cu gerbera roz, bujori și trandafiri pastel" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Cutie cu gerbera și bujori</span><span class="item-desc">Nuanțe de roz, într-o cutie albă</span><a class="ask" data-item="Cutie cu gerbera și bujori" href="#comanda">Întreabă de preț</a></figcaption>
+              <button type="button" class="zoom" aria-label="Mărește: Cutie cu gerbera și bujori"><img src="img/cutie-gerbera-roz.jpg" alt="Cutie albă cu gerbera roz, bujori și trandafiri pastel" loading="lazy" width="472" height="590"></button>
+              <figcaption><span class="item-name">Cutie cu gerbera și bujori</span><span class="item-desc">Nuanțe de roz, într-o cutie albă</span><a class="ask" data-item="Cutie cu gerbera și bujori" href="#comanda">Vreau una asemănătoare</a></figcaption>
             </figure>
           </li>
           <li data-type="cutie">
             <figure>
               <button type="button" class="zoom" aria-label="Mărește: Cutie roșie"><img src="img/cutie-rosie-gerbera.jpg" alt="Cutie roșie cu gerbera, garoafe și trandafiri roșii, legată cu fundă" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Cutie roșie</span><span class="item-desc">Gerbera, garoafe și trandafiri roșii</span><a class="ask" data-item="Cutie roșie cu gerbera și garoafe" href="#comanda">Întreabă de preț</a></figcaption>
+              <figcaption><span class="item-name">Cutie roșie</span><span class="item-desc">Gerbera, garoafe și trandafiri roșii</span><a class="ask" data-item="Cutie roșie cu gerbera și garoafe" href="#comanda">Vreau una asemănătoare</a></figcaption>
             </figure>
           </li>
           <li data-type="cutie">
             <figure>
               <button type="button" class="zoom" aria-label="Mărește: Cutie cu bujori și trandafiri"><img src="img/cutie-roz-bujori.jpg" alt="Cutie roz cu bujor, trandafiri vișinii și flori albe, cu panglici" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Cutie cu bujori și trandafiri</span><span class="item-desc">Bujor, trandafiri vișinii, flori albe</span><a class="ask" data-item="Cutie cu bujori și trandafiri" href="#comanda">Întreabă de preț</a></figcaption>
+              <figcaption><span class="item-name">Cutie cu bujori și trandafiri</span><span class="item-desc">Bujor, trandafiri vișinii, flori albe</span><a class="ask" data-item="Cutie cu bujori și trandafiri" href="#comanda">Vreau una asemănătoare</a></figcaption>
             </figure>
           </li>
           <li data-type="cutie">
             <figure>
               <button type="button" class="zoom" aria-label="Mărește: Cutie cu gerbera galbene"><img src="img/cutie-galbena-gerbera.jpg" alt="Cutie crem cu gerbera galbene, lisianthus alb și spice" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Cutie cu gerbera galbene</span><span class="item-desc">Gerbera, lisianthus, spice de grâu</span><a class="ask" data-item="Cutie cu gerbera galbene" href="#comanda">Întreabă de preț</a></figcaption>
+              <figcaption><span class="item-name">Cutie cu gerbera galbene</span><span class="item-desc">Gerbera, lisianthus, spice de grâu</span><a class="ask" data-item="Cutie cu gerbera galbene" href="#comanda">Vreau una asemănătoare</a></figcaption>
             </figure>
           </li>
+        </ul>
+      </div>
+
+      <div class="rail" data-rail>
+        <div class="wrap rail-head">
+          <h3>Coșuri cu flori</h3>
+          <div class="rail-nav">
+            <button type="button" class="rail-btn" data-dir="-1" aria-label="Coșuri: înapoi">‹</button>
+            <button type="button" class="rail-btn" data-dir="1" aria-label="Coșuri: înainte">›</button>
+          </div>
+        </div>
+        <ul class="rail-track" aria-label="Coșuri cu flori">
           <li data-type="cos">
             <figure>
               <button type="button" class="zoom" aria-label="Mărește: Coș cu hortensie roz"><img src="img/cos-hortensie-roz.jpg" alt="Coș împletit cu hortensie roz, trandafiri piersică și panglici" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Coș cu hortensie roz</span><span class="item-desc">Hortensie, trandafiri piersică, panglici</span><a class="ask" data-item="Coș cu hortensie roz" href="#comanda">Întreabă de preț</a></figcaption>
+              <figcaption><span class="item-name">Coș cu hortensie roz</span><span class="item-desc">Hortensie, trandafiri piersică, panglici</span><a class="ask" data-item="Coș cu hortensie roz" href="#comanda">Vreau unul asemănător</a></figcaption>
             </figure>
           </li>
           <li data-type="cos">
             <figure>
               <button type="button" class="zoom" aria-label="Mărește: Coș cu bujori și trandafiri"><img src="img/cos-bujori-piersica.jpg" alt="Coș alb cu bujori roz, hortensie și trandafiri în nuanțe de piersică" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Coș cu bujori și trandafiri</span><span class="item-desc">Roz și piersică, cu hortensie</span><a class="ask" data-item="Coș cu bujori și trandafiri" href="#comanda">Întreabă de preț</a></figcaption>
+              <figcaption><span class="item-name">Coș cu bujori și trandafiri</span><span class="item-desc">Roz și piersică, cu hortensie</span><a class="ask" data-item="Coș cu bujori și trandafiri" href="#comanda">Vreau unul asemănător</a></figcaption>
             </figure>
           </li>
           <li data-type="cos">
             <figure>
               <button type="button" class="zoom" aria-label="Mărește: Coș cu flori colorate"><img src="img/cos-flori-colorat.jpg" alt="Coș împletit alb cu flori colorate: gerbera, trandafiri, alstroemeria" loading="lazy" width="590" height="590"></button>
-              <figcaption><span class="item-name">Coș cu flori colorate</span><span class="item-desc">Gerbera, trandafiri, alstroemeria</span><a class="ask" data-item="Coș cu flori colorate" href="#comanda">Întreabă de preț</a></figcaption>
+              <figcaption><span class="item-name">Coș cu flori colorate</span><span class="item-desc">Gerbera, trandafiri, alstroemeria</span><a class="ask" data-item="Coș cu flori colorate" href="#comanda">Vreau unul asemănător</a></figcaption>
             </figure>
           </li>
         </ul>
       </div>
     </section>
 
+    <!-- Two worlds -->
     <section class="worlds" aria-labelledby="lumi-titlu">
       <div class="world world-warm">
         <img src="img/buchet-culori-calde.jpg" alt="Buchet în portocaliu, galben și auriu" loading="lazy" width="472" height="590">
@@ -202,6 +255,65 @@
       </div>
     </section>
 
+    <!-- Delivery -->
+    <section class="delivery" id="livrare" aria-labelledby="livrare-titlu">
+      <div class="drive">
+        <div class="wrap drive-inner">
+          <div class="drive-head">
+            <div>
+              <h2 id="livrare-titlu">Ți le aducem noi, cu mașina florăriei</h2>
+              <p>Florile nu stau într-un depozit și nu trec prin curier. Le compunem, le punem în mașina noastră și le ducem direct la ușa celui care le primește.</p>
+            </div>
+            <div class="countdown" data-countdown aria-live="polite">
+              <span class="countdown-label">Livrare în aceeași zi</span>
+              <strong class="countdown-value" data-countdown-value>–</strong>
+              <span class="countdown-note" data-countdown-note></span>
+            </div>
+          </div>
+
+          <div class="road" aria-hidden="true">
+            <svg class="road-svg" viewBox="0 0 1200 330" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <linearGradient id="hill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#D3C8E3"/>
+                  <stop offset="1" stop-color="#E4DDEE" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="fade-x" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#000"/>
+                  <stop offset=".12" stop-color="#fff"/>
+                  <stop offset=".88" stop-color="#fff"/>
+                  <stop offset="1" stop-color="#000"/>
+                </linearGradient>
+                <mask id="hill-fade"><rect width="1200" height="330" fill="url(#fade-x)"/></mask>
+              </defs>
+              <path mask="url(#hill-fade)" d="M0 210 C 120 120, 220 160, 320 110 S 520 60, 640 120 S 860 40, 980 100 S 1140 80, 1200 120 V330 H0Z" fill="url(#hill)"/>
+              <path class="road-base" id="road" d="M40 260 C 200 262, 230 170, 380 176 S 560 280, 720 250 S 900 140, 1040 150 S 1150 190, 1170 170"/>
+              <path class="road-dash" d="M40 260 C 200 262, 230 170, 380 176 S 560 280, 720 250 S 900 140, 1040 150 S 1150 190, 1170 170"/>
+              <path class="road-done" id="road-done" d="M40 260 C 200 262, 230 170, 380 176 S 560 280, 720 250 S 900 140, 1040 150 S 1150 190, 1170 170"/>
+              <g class="stops" data-stops></g>
+              <g id="van" class="van">
+                <g transform="scale(1.3) translate(-58,-56)">
+                  <path d="M6 20 Q6 8 18 8 H76 Q85 8 91 14 L106 30 Q113 32 113 41 V47 Q113 51 109 51 H10 Q6 51 6 47Z" fill="#4B3462"/>
+                  <path d="M80 13 L95 29 H80Z" fill="#E4DDEE"/>
+                  <rect x="14" y="14" width="58" height="27" rx="4" fill="#F8F7FA"/>
+                  <circle cx="24" cy="22" r="4" fill="#E6A5B8"/><circle cx="31" cy="20" r="3.4" fill="#CFA021"/><circle cx="28" cy="27" r="3.2" fill="#B25B7A"/>
+                  <path d="M26 30 v6 M30 30 v6" stroke="#6F8F5E" stroke-width="1.6"/>
+                  <text x="52" y="32" text-anchor="middle" font-family="Marcellus, Georgia, serif" font-size="11" fill="#4B3462">Bloom</text>
+                  <rect x="104" y="36" width="8" height="4" rx="2" fill="#CFA021"/>
+                  <g class="wheel" transform="translate(30 51)"><circle r="9" fill="#261E33"/><circle r="4" fill="#CFC7DC"/><path d="M0 -8 V8" stroke="#261E33" stroke-width="1.5"/></g>
+                  <g class="wheel" transform="translate(90 51)"><circle r="9" fill="#261E33"/><circle r="4" fill="#CFC7DC"/><path d="M0 -8 V8" stroke="#261E33" stroke-width="1.5"/></g>
+                </g>
+              </g>
+            </svg>
+          </div>
+
+          <ol class="zones" data-zones aria-label="Zone de livrare"></ol>
+          <p class="zones-note" data-zones-note></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Steps -->
     <section class="section" id="cum-comanzi" aria-labelledby="pasi-titlu">
       <div class="wrap">
         <div class="section-head">
@@ -217,13 +329,14 @@
             <p>Alegem florile potrivite și îți confirmăm prețul înainte să ne apucăm de lucru.</p>
           </li>
           <li>
-            <h3>Îl ridici din florărie</h3>
-            <p>Pe Str. 1 Decembrie 1918, bl. 65, parter. Dacă ai nevoie de livrare, întreabă-ne când comanzi.</p>
+            <h3>Îl ridici sau ți-l aducem</h3>
+            <p>Treci pe Str. 1 Decembrie 1918, bl. 65, parter, sau îl livrăm noi, cu mașina florăriei, la adresa dorită.</p>
           </li>
         </ol>
       </div>
     </section>
 
+    <!-- Order -->
     <section class="order" id="comanda" aria-labelledby="comanda-titlu">
       <div class="wrap order-inner">
         <div class="order-intro">
@@ -234,15 +347,46 @@
         </div>
 
         <form class="order-form" id="order-form" novalidate>
-          <div class="field">
-            <label for="f-nume">Numele tău</label>
-            <input id="f-nume" name="nume" type="text" autocomplete="name" required>
-            <p class="error" id="f-nume-err" hidden>Scrie-ne numele tău, ca să știm cui răspundem.</p>
+          <fieldset class="segmented">
+            <legend>Cum ajung florile la tine</legend>
+            <label><input type="radio" name="predare" value="ridicare" checked><span>Ridic din florărie</span></label>
+            <label><input type="radio" name="predare" value="livrare"><span>Livrare acasă</span></label>
+          </fieldset>
+
+          <div class="delivery-fields" id="delivery-fields" hidden>
+            <div class="field-row">
+              <div class="field">
+                <label for="f-zona">Zona de livrare</label>
+                <select id="f-zona" name="zona" data-zone-select></select>
+              </div>
+              <div class="field">
+                <label for="f-interval">Interval orar</label>
+                <select id="f-interval" name="interval">
+                  <option>Dimineața (10–13)</option>
+                  <option>După-amiaza (13–16)</option>
+                  <option>Seara (16–19)</option>
+                  <option>Oricând în ziua respectivă</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="f-adresa">Adresa de livrare</label>
+              <input id="f-adresa" name="adresa" type="text" autocomplete="street-address" placeholder="Strada, numărul, blocul, apartamentul">
+              <p class="error" id="f-adresa-err" hidden>Scrie adresa la care livrăm.</p>
+            </div>
           </div>
-          <div class="field">
-            <label for="f-tel">Telefon</label>
-            <input id="f-tel" name="telefon" type="tel" autocomplete="tel" inputmode="tel" placeholder="07xx xxx xxx" required>
-            <p class="error" id="f-tel-err" hidden>Scrie un număr de telefon valid, de exemplu 0723 <span class="redact" aria-hidden="true">000 000</span>.</p>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="f-nume">Numele tău</label>
+              <input id="f-nume" name="nume" type="text" autocomplete="name" required>
+              <p class="error" id="f-nume-err" hidden>Scrie-ne numele tău, ca să știm cui răspundem.</p>
+            </div>
+            <div class="field">
+              <label for="f-tel">Telefon</label>
+              <input id="f-tel" name="telefon" type="tel" autocomplete="tel" inputmode="tel" placeholder="07xx xxx xxx" required>
+              <p class="error" id="f-tel-err" hidden>Scrie un număr de telefon valid, de exemplu 0723 <span class="redact" aria-hidden="true">000 000</span>.</p>
+            </div>
           </div>
           <div class="field-row">
             <div class="field">
@@ -275,6 +419,7 @@
               <label for="f-data">Pentru ce dată</label>
               <input id="f-data" name="data" type="date" required>
               <p class="error" id="f-data-err" hidden>Alege data la care ai nevoie de flori.</p>
+              <p class="hint" id="f-data-hint" hidden></p>
             </div>
           </div>
           <div class="field">
@@ -286,10 +431,12 @@
       </div>
     </section>
 
+    <!-- Shop -->
     <section class="section" id="contact" aria-labelledby="contact-titlu">
       <div class="wrap contact-inner">
         <div class="contact-info">
           <h2 id="contact-titlu">Vino la florărie</h2>
+          <p class="status status-dark" data-status hidden></p>
           <dl>
             <div>
               <dt>Adresă</dt>
@@ -300,20 +447,20 @@
               <dd><a href="#contact">0723 <span class="redact" aria-hidden="true">000 000</span></a></dd>
             </div>
             <div>
-              <dt>Program</dt>
-              <dd>Sună-ne înainte să vii, ca să ne găsești sigur deschis.</dd>
-            </div>
-            <div>
               <dt>Facebook</dt>
               <dd><a href="#contact">Florăria Bloom Petro<span class="redact" aria-hidden="true">ooooo</span></a></dd>
             </div>
           </dl>
+          <div class="hours">
+            <h3>Program</h3>
+            <table class="hours-table" data-hours></table>
+          </div>
         </div>
 
-        <div class="map" id="map">
+        <div class="map" id="map" data-map>
           <img src="img/bloom-coperta.jpg" alt="" width="820" height="360">
           <div class="map-consent">
-            <p>Harta va fi disponibilă în curând.</p>
+            <p>Harta apare aici imediat ce publicăm adresa completă. Până atunci, sună-ne și te îndrumăm.</p>
           </div>
         </div>
       </div>
@@ -339,6 +486,7 @@
   <div class="mobile-bar" aria-label="Contact rapid">
     <a href="#contact">Sună</a>
     <a href="https://wa.me/" rel="noopener" target="_blank">WhatsApp</a>
+    <a href="#comanda" class="mobile-bar-main">Comandă</a>
   </div>
 
   <dialog class="lightbox" id="lightbox" aria-label="Fotografie mărită">
@@ -349,6 +497,27 @@
     <button type="button" class="lb-btn lb-prev" id="lb-prev" aria-label="Fotografia anterioară">‹</button>
     <button type="button" class="lb-btn lb-next" id="lb-next" aria-label="Fotografia următoare">›</button>
     <button type="button" class="lb-btn lb-close" id="lb-close" aria-label="Închide">×</button>
+  </dialog>
+
+  <dialog class="story" id="story" aria-label="Povești din florărie">
+    <div class="story-frame">
+      <img class="story-blur" id="story-blur" src="" alt="">
+      <div class="story-bars" id="story-bars"></div>
+      <div class="story-top">
+        <img src="img/lotus.svg" alt="" width="32" height="24">
+        <strong>Florăria Bloom</strong>
+        <span id="story-label"></span>
+      </div>
+      <img class="story-img" id="story-img" src="" alt="">
+      <div class="story-caption">
+        <p class="story-title" id="story-title"></p>
+        <p class="story-text" id="story-text"></p>
+        <a class="btn btn-light" id="story-cta" href="#comanda">Vreau unul asemănător</a>
+      </div>
+      <button type="button" class="story-tap story-prev" id="story-prev" aria-label="Povestea anterioară"></button>
+      <button type="button" class="story-tap story-next" id="story-next" aria-label="Povestea următoare"></button>
+      <button type="button" class="story-close" id="story-close" aria-label="Închide">×</button>
+    </div>
   </dialog>
 
   <script src="js/main.js" defer></script>

@@ -8,13 +8,22 @@ Site de prezentare pentru Florăria Bloom din Petro•••••: buchete, cut
 
 ## Ce conține
 
-- Galerie cu lucrări reale ale florăriei, filtrabilă (buchete, cutii, coșuri) și cu vizualizare mărită
-- Formular de comandă care deschide WhatsApp cu mesajul gata scris (fără backend, nu salvează date)
+- „Povești” din florărie în stil Instagram: cercuri pe care le apeși și le răsfoiești pe tot ecranul
+- Galerie de lucrări reale, pe rânduri orizontale (buchete, cutii, coșuri), cu vizualizare mărită
+- **Livrare la domiciliu cu mașina florăriei**: o dubiță merge pe drum pe măsură ce derulezi și aprinde zonele de livrare, plus un contor real până la ora limită pentru livrarea în aceeași zi
+- Program cu stare live („Deschis acum” / „Închis”) și ziua de azi evidențiată
+- Formular de comandă care deschide WhatsApp cu mesajul gata scris, cu opțiunea „Ridic din florărie” sau „Livrare acasă” (zonă, adresă, interval orar)
 - Animații: pozele „înfloresc” la intrare, iar conținutul se mărește când ajunge în centrul ecranului
-- Responsive, cu bară de contact rapid pe mobil
-- Politică de confidențialitate, linkuri ANPC / SAL
-- Datele de contact (oraș, telefon) sunt momentan ascunse parțial
-- Date structurate schema.org (`Florist`) pentru Google
+- Responsive, cu bară de contact rapid pe mobil; respectă setarea „reduce motion”
+- Politică de confidențialitate, linkuri ANPC / SAL, date structurate schema.org (`Florist`)
+
+## Program, zone și prețuri de livrare
+
+Toate se schimbă dintr-un singur loc: obiectul `CONFIG` de la începutul lui `js/main.js`.
+Valorile de acum sunt **orientative** și apar pe site cu mențiunea „de confirmat” cât timp `draft: true`.
+Când completezi `mapsQuery` cu adresa completă, apare automat harta Google.
+
+Datele de contact (oraș, telefon) sunt momentan ascunse parțial.
 
 ## Tehnologii
 
