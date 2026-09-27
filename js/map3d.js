@@ -29,10 +29,6 @@ window.initBloomMap = function initBloomMap({ container, root, zones, routes, re
     return (Math.atan2(y, x) * 180) / Math.PI;
   }
   const angleDiff = (a, b) => ((((b - a) % 360) + 540) % 360) - 180;
-  const smooth = (e0, e1, x) => {
-    const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
-    return t * t * (3 - 2 * t);
-  };
   const ease = (u) => (u < 0.5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2);
 
   function prepare(coords) {
@@ -56,6 +52,7 @@ window.initBloomMap = function initBloomMap({ container, root, zones, routes, re
   }
   // Ground height under a point, so the camera follows the van on the terrain, not at sea level
   const groundAt = (lngLat) => {
+    if (lite) return 0;
     const h = typeof map.queryTerrainElevation === "function" ? map.queryTerrainElevation(lngLat) : null;
     return Number.isFinite(h) ? h : 0;
   };
@@ -77,6 +74,8 @@ window.initBloomMap = function initBloomMap({ container, root, zones, routes, re
     bearing: -22,
     maxPitch: 78,
     cooperativeGestures: true,
+    pixelRatio: Math.min(window.devicePixelRatio || 1, desktop.matches ? 1.75 : 1.5),
+    fadeDuration: 0,
     attributionControl: { compact: true },
     locale: {
       "CooperativeGesturesHandler.WindowsHelpText": "Ține apăsat Ctrl și derulează ca să faci zoom pe hartă",
@@ -182,16 +181,26 @@ window.initBloomMap = function initBloomMap({ container, root, zones, routes, re
 
     const vanEl = document.createElement("div");
     vanEl.className = "mk-van";
-    vanEl.innerHTML = `<svg viewBox="0 0 26 50" width="34" height="65" aria-hidden="true">
-      <rect x="1" y="1" width="24" height="48" rx="7" fill="#4B3462" stroke="#fff" stroke-width="1.6"/>
-      <rect x="4" y="5" width="18" height="8" rx="3" fill="#E4DDEE"/>
-      <rect x="4" y="16" width="18" height="29" rx="3" fill="#5E427A"/>
-      <circle cx="13" cy="28" r="3.6" fill="#E6A5B8"/><circle cx="9.5" cy="33" r="3" fill="#CFA021"/><circle cx="16.5" cy="33" r="3" fill="#B25B7A"/>
-      <rect x="2" y="2.5" width="3" height="2" rx="1" fill="#F2D98A"/><rect x="21" y="2.5" width="3" height="2" rx="1" fill="#F2D98A"/>
+    // Rear three-quarter view: the follow camera always sits behind the van
+    vanEl.innerHTML = `<svg viewBox="0 0 84 88" width="66" height="69" aria-hidden="true">
+      <ellipse cx="42" cy="80" rx="34" ry="7" fill="rgba(20,14,26,.35)"/>
+      <rect x="3" y="30" width="7" height="9" rx="2" fill="#2F2140"/><rect x="74" y="30" width="7" height="9" rx="2" fill="#2F2140"/>
+      <path d="M17 12 Q18 5 25 5 H59 Q66 5 67 12 L71 30 H13 Z" fill="#7A5E98"/>
+      <path d="M21 9 H63 L65 16 H19 Z" fill="#8F74AC"/>
+      <rect x="10" y="28" width="64" height="42" rx="7" fill="#4B3462"/>
+      <rect x="15" y="33" width="25" height="15" rx="3" fill="#D9D1E6"/><rect x="44" y="33" width="25" height="15" rx="3" fill="#D9D1E6"/>
+      <path d="M15 33 h25 v6 h-25z M44 33 h25 v6 h-25z" fill="#fff" opacity=".35"/>
+      <line x1="42" y1="31" x2="42" y2="66" stroke="#35244A" stroke-width="1.6"/>
+      <g transform="translate(42 56)" fill="#CFA021"><path d="M0 -6 C3 -3 3 1 0 3 C-3 1 -3 -3 0 -6Z"/><path d="M-1 3 C-6 2 -8 -2 -7 -4 C-4 -3 -2 0 -1 3Z"/><path d="M1 3 C6 2 8 -2 7 -4 C4 -3 2 0 1 3Z"/></g>
+      <rect x="11" y="49" width="5" height="12" rx="2" fill="#E2485C"/><rect x="68" y="49" width="5" height="12" rx="2" fill="#E2485C"/>
+      <rect x="11" y="61" width="5" height="3" rx="1" fill="#F5D6A8"/><rect x="68" y="61" width="5" height="3" rx="1" fill="#F5D6A8"/>
+      <rect x="8" y="66" width="68" height="8" rx="3" fill="#2A1D38"/>
+      <rect x="35" y="66.5" width="14" height="5" rx="1" fill="#F8F7FA"/>
+      <rect x="12" y="68" width="13" height="13" rx="4" fill="#15101C"/><rect x="59" y="68" width="13" height="13" rx="4" fill="#15101C"/>
     </svg>`;
-    van = new maplibregl.Marker({ element: vanEl, rotationAlignment: "map", pitchAlignment: "map" }).setLngLat(shop);
-    popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, anchor: "bottom", offset: 30, className: "van-pop", maxWidth: "260px" });
-    popup.setOffset(40);
+    van = new maplibregl.Marker({ element: vanEl, anchor: "bottom", rotationAlignment: "viewport", pitchAlignment: "viewport" }).setLngLat(shop);
+    popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, anchor: "bottom", className: "van-pop", maxWidth: "260px" });
+    popup.setOffset(78);
   }
 
   /* ---------- panel ---------- */
@@ -221,6 +230,37 @@ window.initBloomMap = function initBloomMap({ container, root, zones, routes, re
     actions.hidden = false;
   }
 
+  /* ---------- performance helpers ---------- */
+  // Adaptive quality: if the device can't keep ~45 fps in the first half second of a drive,
+  // drop the 3D terrain and extruded buildings for the rest of the visit (the route stays the same).
+  let lite = false;
+  function goLite() {
+    if (lite) return;
+    lite = true;
+    map.setTerrain(null);
+    if (map.getLayer("building-3d")) map.setLayoutProperty("building-3d", "visibility", "none");
+    root.classList.add("map3d-lite");
+  }
+  let symbolLayers = [];
+  function setLabels(visible) {
+    if (!symbolLayers.length) symbolLayers = map.getStyle().layers.filter((l) => l.type === "symbol" && !l.id.startsWith("poi")).map((l) => l.id);
+    symbolLayers.forEach((id) => map.setLayoutProperty(id, "visibility", visible ? "visible" : "none"));
+  }
+  // Optional FPS meter: add ?fps to the URL
+  const fpsMeter = new URLSearchParams(location.search).has("fps") ? document.createElement("div") : null;
+  if (fpsMeter) { fpsMeter.className = "fps-meter"; root.append(fpsMeter); }
+  let fpsFrames = 0;
+  let fpsStart = 0;
+  const fpsTick = (now) => {
+    if (!fpsMeter) return;
+    fpsFrames++;
+    if (now - fpsStart >= 500) {
+      fpsMeter.textContent = `${Math.round((fpsFrames * 1000) / (now - fpsStart))} fps`;
+      fpsFrames = 0;
+      fpsStart = now;
+    }
+  };
+
   /* ---------- the drive ---------- */
   let current = null;
   let frame = 0;
@@ -229,6 +269,7 @@ window.initBloomMap = function initBloomMap({ container, root, zones, routes, re
   function stop() {
     cancelAnimationFrame(frame);
     animating = false;
+    setLabels(true);
   }
 
   function arrive(z, r) {
@@ -241,9 +282,9 @@ window.initBloomMap = function initBloomMap({ container, root, zones, routes, re
       .addTo(map);
     popup.getElement()?.classList.add("arrived");
     townMarkers[z.id]?.getElement().classList.add("arrived");
-    if (!reduceMotion) {
-      map.easeTo({ bearing: map.getBearing() + 55, pitch: 60, zoom: 16.4, duration: 6000, easing: (t) => t });
-    }
+    van.setRotation(0);
+    setLabels(true);
+    if (!reduceMotion) map.easeTo({ zoom: 16.4, pitch: 60, duration: 1400 });
   }
 
   function drive(id) {
@@ -269,35 +310,55 @@ window.initBloomMap = function initBloomMap({ container, root, zones, routes, re
     const startB = bearing(r.coords[0], pointAt(r, 120));
     let camB = startB;
     const long = r.total > 6000;
-    const duration = Math.min(17000, Math.max(6500, 4200 + (r.total / 1000) * 430));
+    // Short enough to feel snappy: ~4.5 s in town, never more than 9 s
+    const duration = Math.min(9000, Math.max(4200, 3400 + (r.total / 1000) * 200));
     animating = true;
 
-    map.flyTo({ center: r.coords[0], elevation: groundAt(r.coords[0]), zoom: 16.3, pitch: 62, bearing: startB, padding: panelPadding(), duration: 2000, essential: true });
+    const driveZoom = long ? 14.6 : 15.6;
+    setLabels(false);
+    map.flyTo({ center: r.coords[0], elevation: groundAt(r.coords[0]), zoom: driveZoom, pitch: 62, bearing: startB, padding: panelPadding(), duration: 1200, essential: true });
     map.once("moveend", () => {
       if (!animating || current !== id) return;
       const t0 = performance.now();
+      fpsStart = t0;
+      fpsFrames = 0;
       let ground = groundAt(r.coords[0]);
+      let groundTarget = ground;
       let lastText = 0;
+      let lastLine = 0;
+      let n = 0;
+      let probe = lite ? null : { frames: 0, start: 0 };
       const step = (now) => {
         if (!animating || current !== id) return;
         const u = Math.min(1, (now - t0) / duration);
         const d = ease(u) * r.total;
         const pos = pointAt(r, d);
-        const heading = bearing(pos, pointAt(r, Math.min(r.total, d + 18)));
-        const look = bearing(pos, pointAt(r, Math.min(r.total, d + 160)));
-        camB += angleDiff(camB, look) * 0.07;
-        const edge = Math.min(d, r.total - d);
-        const zoom = 16.3 - smooth(500, 2200, edge) * (long ? 2.2 : 0.8);
-        ground += (groundAt(pos) - ground) * 0.2;
-        map.jumpTo({ center: pos, elevation: ground, bearing: camB, zoom, pitch: 62 });
-        van.setLngLat(pos).setRotation(heading);
-        setProgress(d / r.total);
-        if (now - lastText > 250) {
+        const heading = bearing(pos, pointAt(r, Math.min(r.total, d + 25)));
+        const look = bearing(pos, pointAt(r, Math.min(r.total, d + 220)));
+        camB += angleDiff(camB, look) * 0.09;
+        if (n++ % 4 === 0) groundTarget = groundAt(pos);
+        ground += (groundTarget - ground) * 0.15;
+        map.jumpTo({ center: pos, elevation: lite ? 0 : ground, bearing: camB, zoom: driveZoom, pitch: lite ? 55 : 62 });
+        fpsTick(now);
+        if (probe) {
+          probe.frames++;
+          if (!probe.start) probe.start = now;
+          else if (now - probe.start >= 600) {
+            if (((probe.frames - 1) * 1000) / (now - probe.start) < 45) goLite();
+            probe = null;
+          }
+        }
+        // The van leans a little into bends, relative to the camera
+        van.setLngLat(pos).setRotation(Math.max(-28, Math.min(28, angleDiff(camB, heading))) * 0.6);
+        popup.setLngLat(pos);
+        if (now - lastLine > 90) {
+          lastLine = now;
+          setProgress(d / r.total);
+        }
+        if (now - lastText > 300) {
           lastText = now;
-          popup.setLngLat(pos).setHTML(`<strong>Spre ${z.name}</strong><span>${fmtKm(r.total - d)} rămași</span>`);
+          popup.setHTML(`<strong>Spre ${z.name}</strong><span>${fmtKm(r.total - d)} rămași</span>`);
           if (!popup.isOpen()) popup.addTo(map);
-        } else {
-          popup.setLngLat(pos);
         }
         if (u < 1) frame = requestAnimationFrame(step);
         else {

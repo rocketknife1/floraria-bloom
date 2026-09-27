@@ -597,6 +597,7 @@ p { margin: 0; }
 .van-pop.arrived span { color: var(--plum-deep); font-weight: 500; font-size: 1rem; }
 @keyframes pop { from { transform: scale(.6); opacity: 0; } }
 .maplibregl-ctrl-attrib { font-size: 11px; }
+.fps-meter { position: absolute; right: 60px; top: 12px; z-index: 5; padding: 4px 10px; border-radius: 8px; background: rgba(0,0,0,.7); color: #7CFC9A; font: 600 13px/1.4 ui-monospace, monospace; }
 
 /* Steps */
 .steps {

@@ -552,8 +552,8 @@
     css.href = `${MAPLIBRE}.css`;
     document.head.append(css);
     try {
-      await Promise.all([loadScript(`${MAPLIBRE}.js`), loadScript("js/routes.js?v=9")]);
-      await loadScript("js/map3d.js?v=9");
+      await Promise.all([loadScript(`${MAPLIBRE}.js`), loadScript("js/routes.js?v=13")]);
+      await loadScript("js/map3d.js?v=13");
       window.initBloomMap({
         container: $("#map3d"),
         root: mapRoot,
@@ -593,6 +593,7 @@
   const hero = $(".hero");
   const card = $(".hero-card");
   const delivery = $(".delivery");
+  const roadEl = $(".road");
   const greenroom = $(".greenroom");
   const greenImg = $(".greenroom-media img");
   const petals = $$(".petal").map((el, i) => ({
@@ -643,13 +644,17 @@
       greenImg.style.transform = `scale(${(1.22 - gp * 0.22).toFixed(4)}) translateY(${((gp - 0.5) * -40).toFixed(1)}px)`;
     }
 
-    // The van drives while the delivery scene is pinned (desktop) or passes through the viewport (mobile)
+    // Desktop: the van drives while the delivery scene is pinned.
+    // Mobile: it waits at the shop until the road itself is on screen, then drives
+    // as the road travels from the bottom of the screen to its upper third.
     const r = delivery.getBoundingClientRect();
     if (r.bottom > 0 && r.top < vh) {
-      const dp = pinnedQuery.matches
-        ? -r.top / Math.max(1, r.height - vh)
-        : (vh * 0.75 - r.top) / (r.height * 0.8);
-      placeVan(dp);
+      if (pinnedQuery.matches) {
+        placeVan(-r.top / Math.max(1, r.height - vh));
+      } else {
+        const rr = roadEl.getBoundingClientRect();
+        placeVan((vh * 0.82 - rr.top) / (vh * 0.5));
+      }
     }
   };
   const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
