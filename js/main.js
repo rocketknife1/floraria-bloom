@@ -552,8 +552,8 @@
     css.href = `${MAPLIBRE}.css`;
     document.head.append(css);
     try {
-      await Promise.all([loadScript(`${MAPLIBRE}.js`), loadScript("js/routes.js?v=8")]);
-      await loadScript("js/map3d.js?v=8");
+      await Promise.all([loadScript(`${MAPLIBRE}.js`), loadScript("js/routes.js?v=9")]);
+      await loadScript("js/map3d.js?v=9");
       window.initBloomMap({
         container: $("#map3d"),
         root: mapRoot,

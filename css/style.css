@@ -583,7 +583,7 @@ p { margin: 0; }
 .mk-town.active span { color: #E4DDEE; }
 .mk-town.active::after { border-top-color: var(--plum); }
 .mk-van { filter: drop-shadow(0 6px 6px rgba(38, 30, 51, .45)); }
-.mk-town.arrived { opacity: 0; pointer-events: none; }
+.mk-town.arrived { visibility: hidden; }
 .mk-town { transition: background-color .2s, color .2s, transform .2s, opacity .3s; }
 .van-pop .maplibregl-popup-content {
   display: grid; gap: 2px; padding: 10px 16px; border-radius: 14px; text-align: center;
