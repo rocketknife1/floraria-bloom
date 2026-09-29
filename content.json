@@ -1,0 +1,453 @@
+{
+  "texts": {
+    "hero.tagline": "o floare, un zâmbet",
+    "hero.lead": "Buchete, cutii și coșuri cu flori, compuse de mână în Petroșani. Le ridici din florărie sau ți le aducem acasă, cu mașina noastră, oriunde în Valea Jiului.",
+    "stories.title": "Din florărie, săptămâna asta",
+    "gallery.title": "Ce compunem pentru tine",
+    "gallery.intro": "Fiecare aranjament se face la comandă, așa că florile și culorile se pot schimba după gustul tău și după ce e proaspăt în florărie. Pozele sunt lucrări reale ale noastre.",
+    "rail.buchet": "Buchete",
+    "rail.cutie": "Cutii cu flori",
+    "rail.cos": "Coșuri cu flori",
+    "worlds.warm": "Portocaliu, galben, auriu, ca un apus de august.",
+    "worlds.title": "Două buchete, două lumi",
+    "worlds.text": "Același buchet poate spune povești complet diferite, în funcție de culori. Spune-ne cui îl dăruiești și ce îi place, iar noi alegem florile.",
+    "worlds.question": "Tu spre care te-ai îndrepta?",
+    "worlds.white": "Alb pur, liniștit și clasic.",
+    "accessories.title": "Tot ce le trebuie florilor și plantelor",
+    "accessories.intro": "În florărie găsești și accesoriile: ghivece, foi pentru buchete, panglici, suporturi și ornamente. Te ajutăm să le alegi pe cele potrivite pentru ce ai acasă.",
+    "accessories.ctaTitle": "Cauți ceva anume?",
+    "accessories.ctaText": "Scrie-ne ce îți trebuie și îți spunem dacă îl avem în florărie sau îl aducem.",
+    "accessories.note": "Fotografii ilustrative. Ce avem pe raft se schimbă de la o săptămână la alta.",
+    "plants.title": "O cameră doar pentru plante",
+    "plants.text1": "Plantele nu stau oricum. Le ținem într-o cameră special amenajată, unde fiecare soi are temperatura care îi prinde bine: unele la răcoare, altele la căldură, cu încălzire separată pentru speciile tropicale.",
+    "plants.text2": "Căldura e distribuită uniform în toată camera, fără colțuri reci și fără curenți de aer, ca plantele să crească drept, simetric și să ajungă la tine cu o formă frumoasă.",
+    "plants.note": "Intervale orientative, recomandate pentru fiecare tip de plantă.",
+    "delivery.title": "Ți le aducem noi, cu mașina florăriei",
+    "delivery.text": "Florile nu stau într-un depozit și nu trec prin curier. Le compunem, le punem în mașina noastră și le ducem direct la ușa celui care le primește, în toată Valea Jiului.",
+    "map.title": "Alege de unde ești și urmărește drumul",
+    "map.text": "Harta e reală: străzile, blocurile și munții din Valea Jiului. Alege localitatea ta și vezi pe unde trece mașina florăriei până ajunge la tine.",
+    "steps.title": "Cum comanzi",
+    "steps.1.title": "Ne spui ce îți dorești",
+    "steps.1.text": "Ocazia, culorile preferate și bugetul. Ne suni, ne scrii pe WhatsApp sau treci pe la florărie.",
+    "steps.2.title": "Compunem aranjamentul",
+    "steps.2.text": "Alegem florile potrivite și îți confirmăm prețul înainte să ne apucăm de lucru.",
+    "steps.3.title": "Îl ridici sau ți-l aducem",
+    "steps.3.text": "Treci pe Str. 1 Decembrie 1918, bl. 65, parter, sau îl livrăm noi, cu mașina florăriei, la adresa dorită.",
+    "order.title": "Comandă flori",
+    "order.text": "Completează câteva detalii și îți deschidem conversația pe WhatsApp cu mesajul gata scris. Noi îți răspundem cu propunerea și prețul.",
+    "contact.title": "Vino la florărie",
+    "footer.tag": "o floare, un zâmbet"
+  },
+  "config": {
+    "draft": true,
+    "phoneWa": "",
+    "mapsQuery": "Florăria Bloom, Strada 1 Decembrie 1918, bl. 65, Petroșani",
+    "hours": {
+      "0": null,
+      "1": [
+        "09:00",
+        "19:00"
+      ],
+      "2": [
+        "09:00",
+        "19:00"
+      ],
+      "3": [
+        "09:00",
+        "19:00"
+      ],
+      "4": [
+        "09:00",
+        "19:00"
+      ],
+      "5": [
+        "09:00",
+        "19:00"
+      ],
+      "6": [
+        "09:00",
+        "15:00"
+      ]
+    },
+    "delivery": {
+      "days": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "sameDayCutoff": "15:00",
+      "freeOverLei": 250,
+      "zones": [
+        {
+          "id": "ridicare",
+          "name": "Ridici din florărie",
+          "short": "Florăria",
+          "price": 0,
+          "time": "gata în 1–2 ore",
+          "pickup": true
+        },
+        {
+          "id": "petrosani",
+          "name": "Petroșani",
+          "price": 15,
+          "time": "în aceeași zi",
+          "km": 4,
+          "min": 6
+        },
+        {
+          "id": "petrila",
+          "name": "Petrila",
+          "price": 25,
+          "time": "în aceeași zi",
+          "km": 5.9,
+          "min": 9
+        },
+        {
+          "id": "aninoasa",
+          "name": "Aninoasa",
+          "price": 25,
+          "time": "în aceeași zi",
+          "km": 7,
+          "min": 12
+        },
+        {
+          "id": "vulcan",
+          "name": "Vulcan",
+          "price": 30,
+          "time": "în aceeași zi",
+          "km": 12.2,
+          "min": 19
+        },
+        {
+          "id": "lupeni",
+          "name": "Lupeni",
+          "price": 35,
+          "time": "în aceeași zi",
+          "km": 18.7,
+          "min": 30
+        },
+        {
+          "id": "uricani",
+          "name": "Uricani",
+          "price": 45,
+          "time": "în aceeași zi sau a doua zi",
+          "km": 28.2,
+          "min": 44
+        }
+      ]
+    }
+  },
+  "stories": [
+    {
+      "src": "img/buchet-culori-calde.jpg",
+      "bg": "#4e4021",
+      "label": "Apus",
+      "title": "Buchet în culori calde",
+      "text": "Trandafiri portocalii și galbeni, crizanteme și eucalipt, în hârtie aurie.",
+      "type": "buchet",
+      "width": 472,
+      "height": 590
+    },
+    {
+      "src": "img/trandafiri-rosii.jpg",
+      "bg": "#56192b",
+      "label": "Clasic",
+      "title": "Trandafiri roșii",
+      "text": "Clasicul care nu dă greș, legat simplu, ca să vorbească florile.",
+      "type": "buchet",
+      "width": 540,
+      "height": 720
+    },
+    {
+      "src": "img/cutie-rosie-gerbera.jpg",
+      "bg": "#561921",
+      "label": "Pasiune",
+      "title": "Cutie roșie",
+      "text": "Gerbera, garoafe și trandafiri roșii, într-o cutie legată cu fundă.",
+      "type": "cutie",
+      "width": 472,
+      "height": 590
+    },
+    {
+      "src": "img/buchet-hortensie-albastra.jpg",
+      "bg": "#2c2947",
+      "label": "Albastru",
+      "title": "Buchet cu hortensie albastră",
+      "text": "Hortensie, trandafiri și lisianthus mov, în hârtie roșie.",
+      "type": "buchet",
+      "width": 472,
+      "height": 590
+    },
+    {
+      "src": "img/cos-bujori-piersica.jpg",
+      "bg": "#3f3730",
+      "label": "Piersică",
+      "title": "Coș cu bujori și trandafiri",
+      "text": "Roz și piersică, cu hortensie, într-un coș alb.",
+      "type": "cos",
+      "width": 472,
+      "height": 590
+    },
+    {
+      "src": "img/cutie-galbena-gerbera.jpg",
+      "bg": "#4f3d20",
+      "label": "Soare",
+      "title": "Cutie cu gerbera galbene",
+      "text": "Gerbera, lisianthus și spice de grâu, pentru o zi luminoasă.",
+      "type": "cutie",
+      "width": 472,
+      "height": 590
+    },
+    {
+      "src": "img/buchet-trandafiri-albi.jpg",
+      "bg": "#3e3631",
+      "label": "Alb pur",
+      "title": "Buchet de trandafiri albi",
+      "text": "Trandafiri albi cu verdeață, în hârtie verde-salvie.",
+      "type": "buchet",
+      "width": 472,
+      "height": 590
+    },
+    {
+      "src": "img/cutie-roz-bujori.jpg",
+      "bg": "#492630",
+      "label": "Bujori",
+      "title": "Cutie cu bujori și trandafiri",
+      "text": "Bujor, trandafiri vișinii și flori albe, cu panglici.",
+      "type": "cutie",
+      "width": 472,
+      "height": 590
+    }
+  ],
+  "gallery": [
+    {
+      "type": "buchet",
+      "name": "Buchet în culori calde",
+      "desc": "Trandafiri portocalii și galbeni, crizanteme, eucalipt",
+      "img": "img/buchet-culori-calde.jpg",
+      "alt": "Buchet cu trandafiri portocalii și galbeni, crizanteme și eucalipt, în hârtie aurie",
+      "width": 472,
+      "height": 590
+    },
+    {
+      "type": "buchet",
+      "name": "Buchet cu hortensie albastră",
+      "desc": "Hortensie, trandafiri, lisianthus mov",
+      "img": "img/buchet-hortensie-albastra.jpg",
+      "alt": "Buchet cu hortensie albastră, trandafiri roșii și roz, lisianthus mov, în hârtie roșie",
+      "width": 472,
+      "height": 590
+    },
+    {
+      "type": "buchet",
+      "name": "Buchet de trandafiri albi",
+      "desc": "Trandafiri albi, verdeață, hârtie verde-salvie",
+      "img": "img/buchet-trandafiri-albi.jpg",
+      "alt": "Buchet de trandafiri albi cu verdeață, ținut în mână",
+      "width": 472,
+      "height": 590
+    },
+    {
+      "type": "buchet",
+      "name": "Buchet alb cu crizanteme",
+      "desc": "Trandafiri, crizanteme, margarete",
+      "img": "img/buchet-alb-crizanteme.jpg",
+      "alt": "Buchet alb cu trandafiri, crizanteme și margarete",
+      "width": 526,
+      "height": 589
+    },
+    {
+      "type": "buchet",
+      "name": "Trandafiri roșii",
+      "desc": "Clasicul care nu dă greș",
+      "img": "img/trandafiri-rosii.jpg",
+      "alt": "Buchet de trandafiri roșii, fotografiat de aproape",
+      "width": 540,
+      "height": 720,
+      "ask": "Buchet de trandafiri roșii"
+    },
+    {
+      "type": "cutie",
+      "name": "Cutie cu gerbera și bujori",
+      "desc": "Nuanțe de roz, într-o cutie albă",
+      "img": "img/cutie-gerbera-roz.jpg",
+      "alt": "Cutie albă cu gerbera roz, bujori și trandafiri pastel",
+      "width": 472,
+      "height": 590
+    },
+    {
+      "type": "cutie",
+      "name": "Cutie roșie",
+      "desc": "Gerbera, garoafe și trandafiri roșii",
+      "img": "img/cutie-rosie-gerbera.jpg",
+      "alt": "Cutie roșie cu gerbera, garoafe și trandafiri roșii, legată cu fundă",
+      "width": 472,
+      "height": 590,
+      "ask": "Cutie roșie cu gerbera și garoafe"
+    },
+    {
+      "type": "cutie",
+      "name": "Cutie cu bujori și trandafiri",
+      "desc": "Bujor, trandafiri vișinii, flori albe",
+      "img": "img/cutie-roz-bujori.jpg",
+      "alt": "Cutie roz cu bujor, trandafiri vișinii și flori albe, cu panglici",
+      "width": 472,
+      "height": 590
+    },
+    {
+      "type": "cutie",
+      "name": "Cutie cu gerbera galbene",
+      "desc": "Gerbera, lisianthus, spice de grâu",
+      "img": "img/cutie-galbena-gerbera.jpg",
+      "alt": "Cutie crem cu gerbera galbene, lisianthus alb și spice",
+      "width": 472,
+      "height": 590
+    },
+    {
+      "type": "cos",
+      "name": "Coș cu hortensie roz",
+      "desc": "Hortensie, trandafiri piersică, panglici",
+      "img": "img/cos-hortensie-roz.jpg",
+      "alt": "Coș împletit cu hortensie roz, trandafiri piersică și panglici",
+      "width": 472,
+      "height": 590
+    },
+    {
+      "type": "cos",
+      "name": "Coș cu bujori și trandafiri",
+      "desc": "Roz și piersică, cu hortensie",
+      "img": "img/cos-bujori-piersica.jpg",
+      "alt": "Coș alb cu bujori roz, hortensie și trandafiri în nuanțe de piersică",
+      "width": 472,
+      "height": 590
+    },
+    {
+      "type": "cos",
+      "name": "Coș cu flori colorate",
+      "desc": "Gerbera, trandafiri, alstroemeria",
+      "img": "img/cos-flori-colorat.jpg",
+      "alt": "Coș împletit alb cu flori colorate: gerbera, trandafiri, alstroemeria",
+      "width": 590,
+      "height": 590
+    }
+  ],
+  "accessories": [
+    {
+      "title": "Ghivece",
+      "text": "Ceramică, lut și ghivece decorative, în mai multe mărimi și culori.",
+      "img": "img/acc-ghivece.jpg",
+      "alt": "Raft de lemn cu ghivece ceramice în nuanțe de turcoaz, alb și mov",
+      "layout": "wide",
+      "width": 900,
+      "height": 600,
+      "imagePosition": "50% 88%"
+    },
+    {
+      "title": "Foi pentru buchete",
+      "text": "Hârtie, folie și țesătură, ca să împachetezi frumos orice buchet.",
+      "img": "img/acc-foi-buchet.jpg",
+      "alt": "Mâini care împachetează un buchet de flori roz și albe în hârtie albă",
+      "layout": "tall",
+      "width": 900,
+      "height": 1189
+    },
+    {
+      "title": "Suporturi pentru plante",
+      "text": "Araci cu mușchi, tutori și spaliere pentru plantele care urcă.",
+      "img": "img/acc-arac.jpg",
+      "alt": "Plantă cățărătoare legată de un arac acoperit cu mușchi",
+      "layout": "tall",
+      "width": 900,
+      "height": 1125
+    },
+    {
+      "title": "Bandă și panglici decorative",
+      "text": "Satin, voal și dantelă, pe metru sau la rolă.",
+      "img": "img/acc-panglici.jpg",
+      "alt": "Role de panglică mov, roz și cu model floral",
+      "layout": "wide",
+      "width": 900,
+      "height": 675
+    },
+    {
+      "title": "Suporți și postamente",
+      "text": "Ridică plantele la înălțimea potrivită.",
+      "img": "img/acc-suporti.jpg",
+      "alt": "Plante în ghivece albe așezate pe suporți din lemn",
+      "layout": "normal",
+      "width": 900,
+      "height": 1125
+    },
+    {
+      "title": "Ornamente",
+      "text": "Vaze, lumânări și decorațiuni pentru casă și evenimente.",
+      "img": "img/acc-ornamente.jpg",
+      "alt": "Vitrină cu vaze, coloane decorative și flori uscate",
+      "layout": "normal",
+      "width": 900,
+      "height": 1350
+    },
+    {
+      "title": "Ambalaje cadou",
+      "text": "Cutii, pungi și funde, gata de dăruit.",
+      "img": "img/acc-cadou.jpg",
+      "alt": "Cadou împachetat în hârtie maro, cu fundă și flori",
+      "layout": "normal",
+      "width": 900,
+      "height": 1350
+    }
+  ],
+  "climate": [
+    {
+      "id": "tropicale",
+      "tab": "Orhidee și tropicale",
+      "img": "img/zona-orhidee.jpg",
+      "alt": "Orhidee mov într-un ghiveci alb",
+      "title": "Zona caldă, pentru orhidee și plante tropicale",
+      "text": "Orhideele, anthurium și alte plante tropicale stau în zona încălzită, ferite de curenți, cu umiditate ridicată și lumină filtrată.",
+      "min": 20,
+      "max": 24,
+      "hum": "60–70%",
+      "light": "difuză"
+    },
+    {
+      "id": "flori",
+      "tab": "Flori tăiate",
+      "img": "img/trandafiri-rosii.jpg",
+      "alt": "Trandafiri roșii proaspăt tăiați",
+      "title": "Răcoare pentru florile tăiate",
+      "text": "Trandafirii, lisianthus și gerbera așteaptă la rece, în apă proaspătă, ca să rămână închiși și fermi până îi compunem în buchet.",
+      "min": 2,
+      "max": 6,
+      "hum": "85–90%",
+      "light": "slabă"
+    },
+    {
+      "id": "suculente",
+      "tab": "Suculente și cactuși",
+      "img": "img/zona-suculente.jpg",
+      "alt": "Suculente în ghivece de lut, văzute de sus",
+      "title": "Căldură uscată pentru suculente",
+      "text": "Suculentele și cactușii primesc multă lumină, aer mai uscat și căldură constantă, ca să rămână compacte și colorate.",
+      "min": 18,
+      "max": 26,
+      "hum": "30–40%",
+      "light": "puternică"
+    },
+    {
+      "id": "verzi",
+      "tab": "Plante verzi",
+      "img": "img/zona-verzi.jpg",
+      "alt": "Palmier și plante verzi în ghivece",
+      "title": "Echilibru pentru plantele verzi de interior",
+      "text": "Ficus, monstera, palmieri: temperatură stabilă și căldură distribuită uniform, ca frunzele să crească egal pe toate părțile.",
+      "min": 18,
+      "max": 24,
+      "hum": "50–60%",
+      "light": "medie"
+    }
+  ]
+}

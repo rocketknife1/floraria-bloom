@@ -1,0 +1,573 @@
+{
+  "version": 1,
+  "name": "Florăria Bloom",
+  "liveUrl": "https://rocketknife1.github.io/floraria-bloom/",
+  "imageDir": "img",
+  "files": [
+    {
+      "path": "content.json",
+      "sections": [
+        {
+          "key": "gallery",
+          "label": "Galerie (buchete, cutii, coșuri)",
+          "description": "Lucrările din cele trei rânduri de poze.",
+          "type": "list",
+          "itemTitle": "name",
+          "itemSubtitle": "type",
+          "itemImage": "img",
+          "fields": [
+            {
+              "key": "type",
+              "label": "În ce rând apare",
+              "type": "select",
+              "required": true,
+              "options": [
+                {
+                  "value": "buchet",
+                  "label": "Buchet"
+                },
+                {
+                  "value": "cutie",
+                  "label": "Cutie cu flori"
+                },
+                {
+                  "value": "cos",
+                  "label": "Coș cu flori"
+                }
+              ]
+            },
+            {
+              "key": "name",
+              "label": "Nume",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "desc",
+              "label": "Descriere scurtă",
+              "type": "text"
+            },
+            {
+              "key": "img",
+              "label": "Poza",
+              "type": "image",
+              "required": true,
+              "sizeKeys": {
+                "width": "width",
+                "height": "height"
+              }
+            },
+            {
+              "key": "alt",
+              "label": "Ce se vede în poză (pentru nevăzători și Google)",
+              "type": "text"
+            },
+            {
+              "key": "ask",
+              "label": "Cum apare în mesajul de comandă (gol = numele)",
+              "type": "text"
+            }
+          ],
+          "newItem": {
+            "type": "buchet",
+            "name": "",
+            "desc": "",
+            "img": "",
+            "alt": ""
+          }
+        },
+        {
+          "key": "stories",
+          "label": "Povești (cercurile de sus)",
+          "type": "list",
+          "itemTitle": "title",
+          "itemSubtitle": "label",
+          "itemImage": "src",
+          "fields": [
+            {
+              "key": "label",
+              "label": "Eticheta din cerc (un cuvânt)",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "title",
+              "label": "Titlu",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "text",
+              "label": "Text",
+              "type": "longtext"
+            },
+            {
+              "key": "src",
+              "label": "Poza",
+              "type": "image",
+              "required": true,
+              "sizeKeys": {
+                "width": "width",
+                "height": "height"
+              }
+            },
+            {
+              "key": "type",
+              "label": "Tip",
+              "type": "select",
+              "options": [
+                {
+                  "value": "buchet",
+                  "label": "Buchet"
+                },
+                {
+                  "value": "cutie",
+                  "label": "Cutie cu flori"
+                },
+                {
+                  "value": "cos",
+                  "label": "Coș cu flori"
+                }
+              ]
+            },
+            {
+              "key": "bg",
+              "label": "Culoarea de fundal",
+              "type": "color"
+            }
+          ],
+          "newItem": {
+            "src": "",
+            "bg": "#3e3631",
+            "label": "",
+            "title": "",
+            "text": "",
+            "type": "buchet"
+          }
+        },
+        {
+          "key": "config",
+          "label": "Program, telefon și livrare",
+          "type": "group",
+          "fields": [
+            {
+              "key": "draft",
+              "label": "Valori încă neconfirmate (apare „de confirmat” pe site)",
+              "type": "bool"
+            },
+            {
+              "key": "phoneWa",
+              "label": "Număr WhatsApp (ex. 40723123456, fără +)",
+              "type": "text"
+            },
+            {
+              "key": "mapsQuery",
+              "label": "Adresa căutată pe Google Maps",
+              "type": "text"
+            },
+            {
+              "key": "hours",
+              "label": "Program",
+              "type": "hours",
+              "sundayIs": 0
+            },
+            {
+              "key": "delivery",
+              "label": "Livrare",
+              "type": "group",
+              "fields": [
+                {
+                  "key": "days",
+                  "label": "Zile cu livrare",
+                  "type": "weekdays",
+                  "sundayIs": 0
+                },
+                {
+                  "key": "sameDayCutoff",
+                  "label": "Comenzile până la ora asta pleacă azi",
+                  "type": "time"
+                },
+                {
+                  "key": "freeOverLei",
+                  "label": "Livrare gratuită în Petroșani peste (lei)",
+                  "type": "number"
+                },
+                {
+                  "key": "zones",
+                  "label": "Zone de livrare",
+                  "type": "list",
+                  "fixedLength": true,
+                  "itemTitle": "name",
+                  "itemSubtitle": "price",
+                  "description": "Zonele nu se pot adăuga sau șterge de aici: traseele de pe hartă sunt calculate pentru ele.",
+                  "fields": [
+                    {
+                      "key": "name",
+                      "label": "Nume",
+                      "type": "text",
+                      "required": true
+                    },
+                    {
+                      "key": "price",
+                      "label": "Preț livrare (lei, 0 = gratuit)",
+                      "type": "number",
+                      "required": true
+                    },
+                    {
+                      "key": "time",
+                      "label": "Când ajunge",
+                      "type": "text"
+                    },
+                    {
+                      "key": "km",
+                      "label": "Distanță (km, din traseu)",
+                      "type": "readonly"
+                    },
+                    {
+                      "key": "min",
+                      "label": "Durată (min, din traseu)",
+                      "type": "readonly"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "accessories",
+          "label": "Accesorii",
+          "type": "list",
+          "itemTitle": "title",
+          "itemImage": "img",
+          "fields": [
+            {
+              "key": "title",
+              "label": "Titlu",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "text",
+              "label": "Text",
+              "type": "text"
+            },
+            {
+              "key": "img",
+              "label": "Poza",
+              "type": "image",
+              "required": true,
+              "sizeKeys": {
+                "width": "width",
+                "height": "height"
+              }
+            },
+            {
+              "key": "alt",
+              "label": "Ce se vede în poză",
+              "type": "text"
+            },
+            {
+              "key": "layout",
+              "label": "Mărimea casetei",
+              "type": "select",
+              "options": [
+                {
+                  "value": "normal",
+                  "label": "Normală"
+                },
+                {
+                  "value": "wide",
+                  "label": "Lată"
+                },
+                {
+                  "value": "tall",
+                  "label": "Înaltă"
+                }
+              ]
+            },
+            {
+              "key": "imagePosition",
+              "label": "Încadrarea pozei (avansat, ex. 50% 88%)",
+              "type": "text"
+            }
+          ],
+          "newItem": {
+            "title": "",
+            "text": "",
+            "img": "",
+            "alt": "",
+            "layout": "normal"
+          }
+        },
+        {
+          "key": "climate",
+          "label": "Camera plantelor",
+          "type": "list",
+          "itemTitle": "tab",
+          "itemImage": "img",
+          "fields": [
+            {
+              "key": "tab",
+              "label": "Numele butonului",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "id",
+              "label": "Cod intern (fără spații)",
+              "type": "slug",
+              "from": "tab",
+              "required": true
+            },
+            {
+              "key": "title",
+              "label": "Titlu",
+              "type": "text"
+            },
+            {
+              "key": "text",
+              "label": "Text",
+              "type": "longtext"
+            },
+            {
+              "key": "img",
+              "label": "Poza",
+              "type": "image"
+            },
+            {
+              "key": "alt",
+              "label": "Ce se vede în poză",
+              "type": "text"
+            },
+            {
+              "key": "min",
+              "label": "Temperatura minimă (°C)",
+              "type": "number"
+            },
+            {
+              "key": "max",
+              "label": "Temperatura maximă (°C)",
+              "type": "number"
+            },
+            {
+              "key": "hum",
+              "label": "Umiditate (ex. 60–70%)",
+              "type": "text"
+            },
+            {
+              "key": "light",
+              "label": "Lumină",
+              "type": "text"
+            }
+          ],
+          "newItem": {
+            "id": "",
+            "tab": "",
+            "img": "",
+            "alt": "",
+            "title": "",
+            "text": "",
+            "min": 18,
+            "max": 24,
+            "hum": "",
+            "light": ""
+          }
+        },
+        {
+          "key": "texts",
+          "label": "Texte de pe pagină",
+          "description": "Titlurile și paragrafele secțiunilor.",
+          "type": "group",
+          "fields": [
+            {
+              "key": "hero.tagline",
+              "label": "Motto-ul de sub nume",
+              "type": "text"
+            },
+            {
+              "key": "hero.lead",
+              "label": "Textul de prezentare de sus",
+              "type": "longtext"
+            },
+            {
+              "key": "stories.title",
+              "label": "Povești — titlu",
+              "type": "text"
+            },
+            {
+              "key": "gallery.title",
+              "label": "Galerie — titlu",
+              "type": "text"
+            },
+            {
+              "key": "gallery.intro",
+              "label": "Galerie — text",
+              "type": "longtext"
+            },
+            {
+              "key": "rail.buchet",
+              "label": "Rândul de buchete — titlu",
+              "type": "text"
+            },
+            {
+              "key": "rail.cutie",
+              "label": "Rândul de cutii — titlu",
+              "type": "text"
+            },
+            {
+              "key": "rail.cos",
+              "label": "Rândul de coșuri — titlu",
+              "type": "text"
+            },
+            {
+              "key": "worlds.warm",
+              "label": "„Două lumi” — sub poza caldă",
+              "type": "text"
+            },
+            {
+              "key": "worlds.title",
+              "label": "„Două lumi” — titlu",
+              "type": "text"
+            },
+            {
+              "key": "worlds.text",
+              "label": "„Două lumi” — text",
+              "type": "longtext"
+            },
+            {
+              "key": "worlds.question",
+              "label": "„Două lumi” — întrebarea",
+              "type": "text"
+            },
+            {
+              "key": "worlds.white",
+              "label": "„Două lumi” — sub poza albă",
+              "type": "text"
+            },
+            {
+              "key": "accessories.title",
+              "label": "Accesorii — titlu",
+              "type": "text"
+            },
+            {
+              "key": "accessories.intro",
+              "label": "Accesorii — text",
+              "type": "longtext"
+            },
+            {
+              "key": "accessories.ctaTitle",
+              "label": "Accesorii — caseta „Cauți ceva?” titlu",
+              "type": "text"
+            },
+            {
+              "key": "accessories.ctaText",
+              "label": "Accesorii — caseta „Cauți ceva?” text",
+              "type": "longtext"
+            },
+            {
+              "key": "accessories.note",
+              "label": "Accesorii — notă mică",
+              "type": "longtext"
+            },
+            {
+              "key": "plants.title",
+              "label": "Camera plantelor — titlu",
+              "type": "text"
+            },
+            {
+              "key": "plants.text1",
+              "label": "Camera plantelor — primul paragraf",
+              "type": "longtext"
+            },
+            {
+              "key": "plants.text2",
+              "label": "Camera plantelor — al doilea paragraf",
+              "type": "longtext"
+            },
+            {
+              "key": "plants.note",
+              "label": "Camera plantelor — notă",
+              "type": "longtext"
+            },
+            {
+              "key": "delivery.title",
+              "label": "Livrare — titlu",
+              "type": "text"
+            },
+            {
+              "key": "delivery.text",
+              "label": "Livrare — text",
+              "type": "longtext"
+            },
+            {
+              "key": "map.title",
+              "label": "Harta — titlu",
+              "type": "text"
+            },
+            {
+              "key": "map.text",
+              "label": "Harta — text",
+              "type": "longtext"
+            },
+            {
+              "key": "steps.title",
+              "label": "„Cum comanzi” — titlu",
+              "type": "text"
+            },
+            {
+              "key": "steps.1.title",
+              "label": "Pasul 1 — titlu",
+              "type": "text"
+            },
+            {
+              "key": "steps.1.text",
+              "label": "Pasul 1 — text",
+              "type": "longtext"
+            },
+            {
+              "key": "steps.2.title",
+              "label": "Pasul 2 — titlu",
+              "type": "text"
+            },
+            {
+              "key": "steps.2.text",
+              "label": "Pasul 2 — text",
+              "type": "longtext"
+            },
+            {
+              "key": "steps.3.title",
+              "label": "Pasul 3 — titlu",
+              "type": "text"
+            },
+            {
+              "key": "steps.3.text",
+              "label": "Pasul 3 — text",
+              "type": "longtext"
+            },
+            {
+              "key": "order.title",
+              "label": "Comandă — titlu",
+              "type": "text"
+            },
+            {
+              "key": "order.text",
+              "label": "Comandă — text",
+              "type": "longtext"
+            },
+            {
+              "key": "contact.title",
+              "label": "Contact — titlu",
+              "type": "text"
+            },
+            {
+              "key": "footer.tag",
+              "label": "Subsol — motto",
+              "type": "text"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

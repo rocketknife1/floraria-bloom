@@ -1,78 +1,23 @@
-(() => {
+(async () => {
   /* ------------------------------------------------------------------
-   * CONFIG: tot ce ține de program și livrare se schimbă doar aici.
-   * Valorile sunt ORIENTATIVE până le confirmă florăria (draft: true
-   * afișează pe site mențiunea „de confirmat”).
-   * km / min vin din traseele reale din js/routes.js.
+   * CONTENT lives in content.json, so it can be edited without touching
+   * code (e.g. from the Organizator app, which commits that file):
+   *  - config: program, livrare, telefon WhatsApp. Valorile sunt ORIENTATIVE
+   *    până le confirmă florăria (draft: true afișează „de confirmat”).
+   *    km / min vin din traseele reale din js/routes.js, nu se editează.
+   *  - stories, gallery, accessories, climate: listele de pe pagină.
+   *  - texts: titlurile și paragrafele marcate cu data-text în index.html.
    * ------------------------------------------------------------------ */
-  const CONFIG = {
-    draft: true,
-    phoneWa: "", // ex. "40723123456"; gol = WhatsApp fără număr precompletat
-    mapsQuery: "Florăria Bloom, Strada 1 Decembrie 1918, bl. 65, Petroșani",
-    // 0 = duminică … 6 = sâmbătă; null = închis
-    hours: {
-      1: ["09:00", "19:00"],
-      2: ["09:00", "19:00"],
-      3: ["09:00", "19:00"],
-      4: ["09:00", "19:00"],
-      5: ["09:00", "19:00"],
-      6: ["09:00", "15:00"],
-      0: null,
-    },
-    delivery: {
-      days: [1, 2, 3, 4, 5, 6],
-      sameDayCutoff: "15:00",
-      freeOverLei: 250,
-      zones: [
-        { id: "ridicare", name: "Ridici din florărie", short: "Florăria", price: 0, time: "gata în 1–2 ore", pickup: true },
-        { id: "petrosani", name: "Petroșani", price: 15, time: "în aceeași zi", km: 4, min: 6 },
-        { id: "petrila", name: "Petrila", price: 25, time: "în aceeași zi", km: 5.9, min: 9 },
-        { id: "aninoasa", name: "Aninoasa", price: 25, time: "în aceeași zi", km: 7, min: 12 },
-        { id: "vulcan", name: "Vulcan", price: 30, time: "în aceeași zi", km: 12.2, min: 19 },
-        { id: "lupeni", name: "Lupeni", price: 35, time: "în aceeași zi", km: 18.7, min: 30 },
-        { id: "uricani", name: "Uricani", price: 45, time: "în aceeași zi sau a doua zi", km: 28.2, min: 44 },
-      ],
-    },
-  };
+  let CONTENT;
+  try {
+    const res = await fetch("content.json", { cache: "no-store" });
+    CONTENT = await res.json();
+  } catch (err) {
+    console.error("content.json nu s-a putut încărca", err);
+    return;
+  }
+  const { config: CONFIG, stories: STORIES, climate: CLIMATE } = CONTENT;
 
-  const STORIES = [
-    { src: "img/buchet-culori-calde.jpg", bg: "#4e4021", label: "Apus", title: "Buchet în culori calde", text: "Trandafiri portocalii și galbeni, crizanteme și eucalipt, în hârtie aurie.", type: "buchet" },
-    { src: "img/trandafiri-rosii.jpg", bg: "#56192b", label: "Clasic", title: "Trandafiri roșii", text: "Clasicul care nu dă greș, legat simplu, ca să vorbească florile.", type: "buchet" },
-    { src: "img/cutie-rosie-gerbera.jpg", bg: "#561921", label: "Pasiune", title: "Cutie roșie", text: "Gerbera, garoafe și trandafiri roșii, într-o cutie legată cu fundă.", type: "cutie" },
-    { src: "img/buchet-hortensie-albastra.jpg", bg: "#2c2947", label: "Albastru", title: "Buchet cu hortensie albastră", text: "Hortensie, trandafiri și lisianthus mov, în hârtie roșie.", type: "buchet" },
-    { src: "img/cos-bujori-piersica.jpg", bg: "#3f3730", label: "Piersică", title: "Coș cu bujori și trandafiri", text: "Roz și piersică, cu hortensie, într-un coș alb.", type: "cos" },
-    { src: "img/cutie-galbena-gerbera.jpg", bg: "#4f3d20", label: "Soare", title: "Cutie cu gerbera galbene", text: "Gerbera, lisianthus și spice de grâu, pentru o zi luminoasă.", type: "cutie" },
-    { src: "img/buchet-trandafiri-albi.jpg", bg: "#3e3631", label: "Alb pur", title: "Buchet de trandafiri albi", text: "Trandafiri albi cu verdeață, în hârtie verde-salvie.", type: "buchet" },
-    { src: "img/cutie-roz-bujori.jpg", bg: "#492630", label: "Bujori", title: "Cutie cu bujori și trandafiri", text: "Bujor, trandafiri vișinii și flori albe, cu panglici.", type: "cutie" },
-  ];
-
-  // Plant room: typical ranges per plant type
-  const CLIMATE = [
-    {
-      id: "tropicale", tab: "Orhidee și tropicale", img: "img/zona-orhidee.jpg", alt: "Orhidee mov într-un ghiveci alb",
-      title: "Zona caldă, pentru orhidee și plante tropicale",
-      text: "Orhideele, anthurium și alte plante tropicale stau în zona încălzită, ferite de curenți, cu umiditate ridicată și lumină filtrată.",
-      min: 20, max: 24, hum: "60–70%", light: "difuză",
-    },
-    {
-      id: "flori", tab: "Flori tăiate", img: "img/trandafiri-rosii.jpg", alt: "Trandafiri roșii proaspăt tăiați",
-      title: "Răcoare pentru florile tăiate",
-      text: "Trandafirii, lisianthus și gerbera așteaptă la rece, în apă proaspătă, ca să rămână închiși și fermi până îi compunem în buchet.",
-      min: 2, max: 6, hum: "85–90%", light: "slabă",
-    },
-    {
-      id: "suculente", tab: "Suculente și cactuși", img: "img/zona-suculente.jpg", alt: "Suculente în ghivece de lut, văzute de sus",
-      title: "Căldură uscată pentru suculente",
-      text: "Suculentele și cactușii primesc multă lumină, aer mai uscat și căldură constantă, ca să rămână compacte și colorate.",
-      min: 18, max: 26, hum: "30–40%", light: "puternică",
-    },
-    {
-      id: "verzi", tab: "Plante verzi", img: "img/zona-verzi.jpg", alt: "Palmier și plante verzi în ghivece",
-      title: "Echilibru pentru plantele verzi de interior",
-      text: "Ficus, monstera, palmieri: temperatură stabilă și căldură distribuită uniform, ca frunzele să crească egal pe toate părțile.",
-      min: 18, max: 24, hum: "50–60%", light: "medie",
-    },
-  ];
 
   const TYPE_LABEL = { buchet: "Buchet", cutie: "Cutie cu flori", cos: "Coș cu flori" };
   const DAYS = ["duminică", "luni", "marți", "miercuri", "joi", "vineri", "sâmbătă"];
@@ -90,6 +35,38 @@
   const draftTag = () => (CONFIG.draft ? ' <span class="draft">de confirmat</span>' : "");
   const lei = (n) => (n === 0 ? "gratuit" : `${n} lei`);
   const km = (n) => `${String(n).replace(".", ",")} km`;
+
+  /* Content from content.json: texts, story rings, gallery rails, accessories */
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  const dims = (o) => (o.width && o.height ? ` width="${o.width}" height="${o.height}"` : "");
+  $$("[data-text]").forEach((el) => {
+    const t = CONTENT.texts?.[el.dataset.text];
+    if (t != null) el.textContent = t;
+  });
+  $("[data-story-rings]").innerHTML = STORIES.map(
+    (s, i) => `<li><button type="button" class="story-ring" data-story="${i}"><img src="${esc(s.src)}" alt=""${dims(s)} loading="lazy"><span>${esc(s.label)}</span></button></li>`,
+  ).join("");
+  const ASK_LABEL = { cutie: "Vreau una asemănătoare" };
+  $$("[data-gallery]").forEach((ul) => {
+    const type = ul.dataset.gallery;
+    ul.innerHTML = CONTENT.gallery
+      .filter((g) => g.type === type)
+      .map(
+        (g) => `<li data-type="${type}"><figure><button type="button" class="zoom" aria-label="Mărește: ${esc(g.name)}"><img src="${esc(g.img)}" alt="${esc(g.alt)}" loading="lazy"${dims(g)}></button><figcaption><span class="item-name">${esc(g.name)}</span><span class="item-desc">${esc(g.desc)}</span><a class="ask" data-item="${esc(g.ask || g.name)}" href="#comanda">${ASK_LABEL[type] ?? "Vreau unul asemănător"}</a></figcaption></figure></li>`,
+      )
+      .join("");
+    ul.closest("[data-rail]").hidden = !ul.children.length;
+  });
+  $("[data-accessories]").insertAdjacentHTML(
+    "afterbegin",
+    CONTENT.accessories
+      .map((a) => {
+        const cls = a.layout === "wide" ? ' class="b-wide"' : a.layout === "tall" ? ' class="b-tall"' : "";
+        const style = a.imagePosition ? ` style="object-position: ${esc(a.imagePosition)}"` : "";
+        return `<li${cls}><img${style} src="${esc(a.img)}" alt="${esc(a.alt)}" loading="lazy"${dims(a)}><div class="b-text"><h3>${esc(a.title)}</h3><p>${esc(a.text)}</p></div></li>`;
+      })
+      .join(""),
+  );
 
   /* Header + menu */
   const header = $(".site-header");

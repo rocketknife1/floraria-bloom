@@ -81,9 +81,9 @@
       <div class="hero-card">
         <img class="hero-lotus" src="img/lotus.svg" alt="" width="84" height="63">
         <h1 id="hero-titlu">Florăria Bloom</h1>
-        <p class="tagline">o floare, un zâmbet</p>
+        <p class="tagline" data-text="hero.tagline">o floare, un zâmbet</p>
         <p class="status" data-status hidden></p>
-        <p class="hero-lead">Buchete, cutii și coșuri cu flori, compuse de mână în Petroșani. Le ridici din florărie sau ți le aducem acasă, cu mașina noastră, oriunde în Valea Jiului.</p>
+        <p class="hero-lead" data-text="hero.lead">Buchete, cutii și coșuri cu flori, compuse de mână în Petroșani. Le ridici din florărie sau ți le aducem acasă, cu mașina noastră, oriunde în Valea Jiului.</p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#comanda">Comandă flori</a>
           <a class="btn btn-ghost" href="#livrare">Vezi livrarea</a>
@@ -106,19 +106,10 @@
     <section class="stories-section" id="povesti" aria-labelledby="povesti-titlu">
       <div class="wrap">
         <div class="stories-head">
-          <h2 id="povesti-titlu">Din florărie, săptămâna asta</h2>
+          <h2 id="povesti-titlu" data-text="stories.title">Din florărie, săptămâna asta</h2>
           <p>Apasă pe un cerc și răsfoiește lucrările. Mai multe pe <a href="https://www.instagram.com/florariabloompetrosani/" target="_blank" rel="noopener">Instagram</a>.</p>
         </div>
-        <ul class="stories" aria-label="Povești din florărie">
-          <li><button type="button" class="story-ring" data-story="0"><img src="img/buchet-culori-calde.jpg" alt="" width="472" height="590" loading="lazy"><span>Apus</span></button></li>
-          <li><button type="button" class="story-ring" data-story="1"><img src="img/trandafiri-rosii.jpg" alt="" width="540" height="720" loading="lazy"><span>Clasic</span></button></li>
-          <li><button type="button" class="story-ring" data-story="2"><img src="img/cutie-rosie-gerbera.jpg" alt="" width="472" height="590" loading="lazy"><span>Pasiune</span></button></li>
-          <li><button type="button" class="story-ring" data-story="3"><img src="img/buchet-hortensie-albastra.jpg" alt="" width="472" height="590" loading="lazy"><span>Albastru</span></button></li>
-          <li><button type="button" class="story-ring" data-story="4"><img src="img/cos-bujori-piersica.jpg" alt="" width="472" height="590" loading="lazy"><span>Piersică</span></button></li>
-          <li><button type="button" class="story-ring" data-story="5"><img src="img/cutie-galbena-gerbera.jpg" alt="" width="472" height="590" loading="lazy"><span>Soare</span></button></li>
-          <li><button type="button" class="story-ring" data-story="6"><img src="img/buchet-trandafiri-albi.jpg" alt="" width="472" height="590" loading="lazy"><span>Alb pur</span></button></li>
-          <li><button type="button" class="story-ring" data-story="7"><img src="img/cutie-roz-bujori.jpg" alt="" width="472" height="590" loading="lazy"><span>Bujori</span></button></li>
-        </ul>
+        <ul class="stories" aria-label="Povești din florărie" data-story-rings></ul>
       </div>
     </section>
 
@@ -126,117 +117,42 @@
     <section class="section section-flush" id="flori" aria-labelledby="flori-titlu">
       <div class="wrap">
         <div class="section-head">
-          <h2 id="flori-titlu">Ce compunem pentru tine</h2>
-          <p>Fiecare aranjament se face la comandă, așa că florile și culorile se pot schimba după gustul tău și după ce e proaspăt în florărie. Pozele sunt lucrări reale ale noastre.</p>
+          <h2 id="flori-titlu" data-text="gallery.title">Ce compunem pentru tine</h2>
+          <p data-text="gallery.intro">Fiecare aranjament se face la comandă, așa că florile și culorile se pot schimba după gustul tău și după ce e proaspăt în florărie. Pozele sunt lucrări reale ale noastre.</p>
         </div>
       </div>
 
       <div class="rail" data-rail>
         <div class="wrap rail-head">
-          <h3>Buchete</h3>
+          <h3 data-text="rail.buchet">Buchete</h3>
           <div class="rail-nav">
             <button type="button" class="rail-btn" data-dir="-1" aria-label="Buchete: înapoi">‹</button>
             <button type="button" class="rail-btn" data-dir="1" aria-label="Buchete: înainte">›</button>
           </div>
         </div>
-        <ul class="rail-track" aria-label="Buchete">
-          <li data-type="buchet">
-            <figure>
-              <button type="button" class="zoom" aria-label="Mărește: Buchet în culori calde"><img src="img/buchet-culori-calde.jpg" alt="Buchet cu trandafiri portocalii și galbeni, crizanteme și eucalipt, în hârtie aurie" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Buchet în culori calde</span><span class="item-desc">Trandafiri portocalii și galbeni, crizanteme, eucalipt</span><a class="ask" data-item="Buchet în culori calde" href="#comanda">Vreau unul asemănător</a></figcaption>
-            </figure>
-          </li>
-          <li data-type="buchet">
-            <figure>
-              <button type="button" class="zoom" aria-label="Mărește: Buchet cu hortensie albastră"><img src="img/buchet-hortensie-albastra.jpg" alt="Buchet cu hortensie albastră, trandafiri roșii și roz, lisianthus mov, în hârtie roșie" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Buchet cu hortensie albastră</span><span class="item-desc">Hortensie, trandafiri, lisianthus mov</span><a class="ask" data-item="Buchet cu hortensie albastră" href="#comanda">Vreau unul asemănător</a></figcaption>
-            </figure>
-          </li>
-          <li data-type="buchet">
-            <figure>
-              <button type="button" class="zoom" aria-label="Mărește: Buchet de trandafiri albi"><img src="img/buchet-trandafiri-albi.jpg" alt="Buchet de trandafiri albi cu verdeață, ținut în mână" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Buchet de trandafiri albi</span><span class="item-desc">Trandafiri albi, verdeață, hârtie verde-salvie</span><a class="ask" data-item="Buchet de trandafiri albi" href="#comanda">Vreau unul asemănător</a></figcaption>
-            </figure>
-          </li>
-          <li data-type="buchet">
-            <figure>
-              <button type="button" class="zoom" aria-label="Mărește: Buchet alb cu crizanteme"><img src="img/buchet-alb-crizanteme.jpg" alt="Buchet alb cu trandafiri, crizanteme și margarete" loading="lazy" width="526" height="589"></button>
-              <figcaption><span class="item-name">Buchet alb cu crizanteme</span><span class="item-desc">Trandafiri, crizanteme, margarete</span><a class="ask" data-item="Buchet alb cu crizanteme" href="#comanda">Vreau unul asemănător</a></figcaption>
-            </figure>
-          </li>
-          <li data-type="buchet">
-            <figure>
-              <button type="button" class="zoom" aria-label="Mărește: Trandafiri roșii"><img src="img/trandafiri-rosii.jpg" alt="Buchet de trandafiri roșii, fotografiat de aproape" loading="lazy" width="540" height="720"></button>
-              <figcaption><span class="item-name">Trandafiri roșii</span><span class="item-desc">Clasicul care nu dă greș</span><a class="ask" data-item="Buchet de trandafiri roșii" href="#comanda">Vreau unul asemănător</a></figcaption>
-            </figure>
-          </li>
-        </ul>
+        <ul class="rail-track" aria-label="Buchete" data-gallery="buchet"></ul>
       </div>
 
       <div class="rail" data-rail>
         <div class="wrap rail-head">
-          <h3>Cutii cu flori</h3>
+          <h3 data-text="rail.cutie">Cutii cu flori</h3>
           <div class="rail-nav">
             <button type="button" class="rail-btn" data-dir="-1" aria-label="Cutii: înapoi">‹</button>
             <button type="button" class="rail-btn" data-dir="1" aria-label="Cutii: înainte">›</button>
           </div>
         </div>
-        <ul class="rail-track" aria-label="Cutii cu flori">
-          <li data-type="cutie">
-            <figure>
-              <button type="button" class="zoom" aria-label="Mărește: Cutie cu gerbera și bujori"><img src="img/cutie-gerbera-roz.jpg" alt="Cutie albă cu gerbera roz, bujori și trandafiri pastel" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Cutie cu gerbera și bujori</span><span class="item-desc">Nuanțe de roz, într-o cutie albă</span><a class="ask" data-item="Cutie cu gerbera și bujori" href="#comanda">Vreau una asemănătoare</a></figcaption>
-            </figure>
-          </li>
-          <li data-type="cutie">
-            <figure>
-              <button type="button" class="zoom" aria-label="Mărește: Cutie roșie"><img src="img/cutie-rosie-gerbera.jpg" alt="Cutie roșie cu gerbera, garoafe și trandafiri roșii, legată cu fundă" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Cutie roșie</span><span class="item-desc">Gerbera, garoafe și trandafiri roșii</span><a class="ask" data-item="Cutie roșie cu gerbera și garoafe" href="#comanda">Vreau una asemănătoare</a></figcaption>
-            </figure>
-          </li>
-          <li data-type="cutie">
-            <figure>
-              <button type="button" class="zoom" aria-label="Mărește: Cutie cu bujori și trandafiri"><img src="img/cutie-roz-bujori.jpg" alt="Cutie roz cu bujor, trandafiri vișinii și flori albe, cu panglici" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Cutie cu bujori și trandafiri</span><span class="item-desc">Bujor, trandafiri vișinii, flori albe</span><a class="ask" data-item="Cutie cu bujori și trandafiri" href="#comanda">Vreau una asemănătoare</a></figcaption>
-            </figure>
-          </li>
-          <li data-type="cutie">
-            <figure>
-              <button type="button" class="zoom" aria-label="Mărește: Cutie cu gerbera galbene"><img src="img/cutie-galbena-gerbera.jpg" alt="Cutie crem cu gerbera galbene, lisianthus alb și spice" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Cutie cu gerbera galbene</span><span class="item-desc">Gerbera, lisianthus, spice de grâu</span><a class="ask" data-item="Cutie cu gerbera galbene" href="#comanda">Vreau una asemănătoare</a></figcaption>
-            </figure>
-          </li>
-        </ul>
+        <ul class="rail-track" aria-label="Cutii cu flori" data-gallery="cutie"></ul>
       </div>
 
       <div class="rail" data-rail>
         <div class="wrap rail-head">
-          <h3>Coșuri cu flori</h3>
+          <h3 data-text="rail.cos">Coșuri cu flori</h3>
           <div class="rail-nav">
             <button type="button" class="rail-btn" data-dir="-1" aria-label="Coșuri: înapoi">‹</button>
             <button type="button" class="rail-btn" data-dir="1" aria-label="Coșuri: înainte">›</button>
           </div>
         </div>
-        <ul class="rail-track" aria-label="Coșuri cu flori">
-          <li data-type="cos">
-            <figure>
-              <button type="button" class="zoom" aria-label="Mărește: Coș cu hortensie roz"><img src="img/cos-hortensie-roz.jpg" alt="Coș împletit cu hortensie roz, trandafiri piersică și panglici" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Coș cu hortensie roz</span><span class="item-desc">Hortensie, trandafiri piersică, panglici</span><a class="ask" data-item="Coș cu hortensie roz" href="#comanda">Vreau unul asemănător</a></figcaption>
-            </figure>
-          </li>
-          <li data-type="cos">
-            <figure>
-              <button type="button" class="zoom" aria-label="Mărește: Coș cu bujori și trandafiri"><img src="img/cos-bujori-piersica.jpg" alt="Coș alb cu bujori roz, hortensie și trandafiri în nuanțe de piersică" loading="lazy" width="472" height="590"></button>
-              <figcaption><span class="item-name">Coș cu bujori și trandafiri</span><span class="item-desc">Roz și piersică, cu hortensie</span><a class="ask" data-item="Coș cu bujori și trandafiri" href="#comanda">Vreau unul asemănător</a></figcaption>
-            </figure>
-          </li>
-          <li data-type="cos">
-            <figure>
-              <button type="button" class="zoom" aria-label="Mărește: Coș cu flori colorate"><img src="img/cos-flori-colorat.jpg" alt="Coș împletit alb cu flori colorate: gerbera, trandafiri, alstroemeria" loading="lazy" width="590" height="590"></button>
-              <figcaption><span class="item-name">Coș cu flori colorate</span><span class="item-desc">Gerbera, trandafiri, alstroemeria</span><a class="ask" data-item="Coș cu flori colorate" href="#comanda">Vreau unul asemănător</a></figcaption>
-            </figure>
-          </li>
-        </ul>
+        <ul class="rail-track" aria-label="Coșuri cu flori" data-gallery="cos"></ul>
       </div>
     </section>
 
@@ -244,17 +160,17 @@
     <section class="worlds" aria-labelledby="lumi-titlu">
       <div class="world world-warm">
         <img src="img/buchet-culori-calde.jpg" alt="Buchet în portocaliu, galben și auriu" loading="lazy" width="472" height="590">
-        <p>Portocaliu, galben, auriu, ca un apus de august.</p>
+        <p data-text="worlds.warm">Portocaliu, galben, auriu, ca un apus de august.</p>
       </div>
       <div class="worlds-text">
-        <h2 id="lumi-titlu">Două buchete, două lumi</h2>
-        <p>Același buchet poate spune povești complet diferite, în funcție de culori. Spune-ne cui îl dăruiești și ce îi place, iar noi alegem florile.</p>
-        <p class="worlds-q">Tu spre care te-ai îndrepta?</p>
+        <h2 id="lumi-titlu" data-text="worlds.title">Două buchete, două lumi</h2>
+        <p data-text="worlds.text">Același buchet poate spune povești complet diferite, în funcție de culori. Spune-ne cui îl dăruiești și ce îi place, iar noi alegem florile.</p>
+        <p class="worlds-q" data-text="worlds.question">Tu spre care te-ai îndrepta?</p>
         <a class="btn btn-primary" href="#comanda">Vreau un buchet ca acesta</a>
       </div>
       <div class="world world-white">
         <img src="img/buchet-trandafiri-albi.jpg" alt="Buchet de trandafiri albi" loading="lazy" width="472" height="590">
-        <p>Alb pur, liniștit și clasic.</p>
+        <p data-text="worlds.white">Alb pur, liniștit și clasic.</p>
       </div>
     </section>
 
@@ -262,45 +178,17 @@
     <section class="section accessories" id="accesorii" aria-labelledby="acc-titlu">
       <div class="wrap">
         <div class="section-head">
-          <h2 id="acc-titlu">Tot ce le trebuie florilor și plantelor</h2>
-          <p>În florărie găsești și accesoriile: ghivece, foi pentru buchete, panglici, suporturi și ornamente. Te ajutăm să le alegi pe cele potrivite pentru ce ai acasă.</p>
+          <h2 id="acc-titlu" data-text="accessories.title">Tot ce le trebuie florilor și plantelor</h2>
+          <p data-text="accessories.intro">În florărie găsești și accesoriile: ghivece, foi pentru buchete, panglici, suporturi și ornamente. Te ajutăm să le alegi pe cele potrivite pentru ce ai acasă.</p>
         </div>
-        <ul class="bento">
-          <li class="b-wide">
-            <img style="object-position: 50% 88%" src="img/acc-ghivece.jpg" alt="Raft de lemn cu ghivece ceramice în nuanțe de turcoaz, alb și mov" loading="lazy" width="900" height="600">
-            <div class="b-text"><h3>Ghivece</h3><p>Ceramică, lut și ghivece decorative, în mai multe mărimi și culori.</p></div>
-          </li>
-          <li class="b-tall">
-            <img src="img/acc-foi-buchet.jpg" alt="Mâini care împachetează un buchet de flori roz și albe în hârtie albă" loading="lazy" width="900" height="1189">
-            <div class="b-text"><h3>Foi pentru buchete</h3><p>Hârtie, folie și țesătură, ca să împachetezi frumos orice buchet.</p></div>
-          </li>
-          <li class="b-tall">
-            <img src="img/acc-arac.jpg" alt="Plantă cățărătoare legată de un arac acoperit cu mușchi" loading="lazy" width="900" height="1125">
-            <div class="b-text"><h3>Suporturi pentru plante</h3><p>Araci cu mușchi, tutori și spaliere pentru plantele care urcă.</p></div>
-          </li>
-          <li class="b-wide">
-            <img src="img/acc-panglici.jpg" alt="Role de panglică mov, roz și cu model floral" loading="lazy" width="900" height="675">
-            <div class="b-text"><h3>Bandă și panglici decorative</h3><p>Satin, voal și dantelă, pe metru sau la rolă.</p></div>
-          </li>
-          <li>
-            <img src="img/acc-suporti.jpg" alt="Plante în ghivece albe așezate pe suporți din lemn" loading="lazy" width="900" height="1125">
-            <div class="b-text"><h3>Suporți și postamente</h3><p>Ridică plantele la înălțimea potrivită.</p></div>
-          </li>
-          <li>
-            <img src="img/acc-ornamente.jpg" alt="Vitrină cu vaze, coloane decorative și flori uscate" loading="lazy" width="900" height="1350">
-            <div class="b-text"><h3>Ornamente</h3><p>Vaze, lumânări și decorațiuni pentru casă și evenimente.</p></div>
-          </li>
-          <li>
-            <img src="img/acc-cadou.jpg" alt="Cadou împachetat în hârtie maro, cu fundă și flori" loading="lazy" width="900" height="1350">
-            <div class="b-text"><h3>Ambalaje cadou</h3><p>Cutii, pungi și funde, gata de dăruit.</p></div>
-          </li>
+        <ul class="bento" data-accessories>
           <li class="b-cta">
-            <h3>Cauți ceva anume?</h3>
-            <p>Scrie-ne ce îți trebuie și îți spunem dacă îl avem în florărie sau îl aducem.</p>
+            <h3 data-text="accessories.ctaTitle">Cauți ceva anume?</h3>
+            <p data-text="accessories.ctaText">Scrie-ne ce îți trebuie și îți spunem dacă îl avem în florărie sau îl aducem.</p>
             <a class="btn btn-light" href="#comanda">Întreabă-ne</a>
           </li>
         </ul>
-        <p class="fine-note">Fotografii ilustrative. Ce avem pe raft se schimbă de la o săptămână la alta.</p>
+        <p class="fine-note" data-text="accessories.note">Fotografii ilustrative. Ce avem pe raft se schimbă de la o săptămână la alta.</p>
       </div>
     </section>
 
@@ -311,9 +199,9 @@
       </div>
       <div class="wrap greenroom-inner">
         <div class="greenroom-intro">
-          <h2 id="plante-titlu">O cameră doar pentru plante</h2>
-          <p>Plantele nu stau oricum. Le ținem într-o cameră special amenajată, unde fiecare soi are temperatura care îi prinde bine: unele la răcoare, altele la căldură, cu încălzire separată pentru speciile tropicale.</p>
-          <p>Căldura e distribuită uniform în toată camera, fără colțuri reci și fără curenți de aer, ca plantele să crească drept, simetric și să ajungă la tine cu o formă frumoasă.</p>
+          <h2 id="plante-titlu" data-text="plants.title">O cameră doar pentru plante</h2>
+          <p data-text="plants.text1">Plantele nu stau oricum. Le ținem într-o cameră special amenajată, unde fiecare soi are temperatura care îi prinde bine: unele la răcoare, altele la căldură, cu încălzire separată pentru speciile tropicale.</p>
+          <p data-text="plants.text2">Căldura e distribuită uniform în toată camera, fără colțuri reci și fără curenți de aer, ca plantele să crească drept, simetric și să ajungă la tine cu o formă frumoasă.</p>
         </div>
 
         <div class="climate" data-climate>
@@ -334,7 +222,7 @@
               </dl>
             </div>
           </div>
-          <p class="climate-note">Intervale orientative, recomandate pentru fiecare tip de plantă.</p>
+          <p class="climate-note" data-text="plants.note">Intervale orientative, recomandate pentru fiecare tip de plantă.</p>
         </div>
       </div>
     </section>
@@ -346,8 +234,8 @@
         <div class="wrap drive-inner">
           <div class="drive-head">
             <div>
-              <h2 id="livrare-titlu">Ți le aducem noi, cu mașina florăriei</h2>
-              <p>Florile nu stau într-un depozit și nu trec prin curier. Le compunem, le punem în mașina noastră și le ducem direct la ușa celui care le primește, în toată Valea Jiului.</p>
+              <h2 id="livrare-titlu" data-text="delivery.title">Ți le aducem noi, cu mașina florăriei</h2>
+              <p data-text="delivery.text">Florile nu stau într-un depozit și nu trec prin curier. Le compunem, le punem în mașina noastră și le ducem direct la ușa celui care le primește, în toată Valea Jiului.</p>
             </div>
             <div class="countdown" data-countdown aria-live="polite">
               <span class="countdown-label">Livrare în aceeași zi</span>
@@ -401,8 +289,8 @@
     <!-- Real 3D map -->
     <section class="map3d-section" id="harta" aria-labelledby="harta-titlu">
       <div class="wrap map3d-head">
-        <h2 id="harta-titlu">Alege de unde ești și urmărește drumul</h2>
-        <p>Harta e reală: străzile, blocurile și munții din Valea Jiului. Alege localitatea ta și vezi pe unde trece mașina florăriei până ajunge la tine.</p>
+        <h2 id="harta-titlu" data-text="map.title">Alege de unde ești și urmărește drumul</h2>
+        <p data-text="map.text">Harta e reală: străzile, blocurile și munții din Valea Jiului. Alege localitatea ta și vezi pe unde trece mașina florăriei până ajunge la tine.</p>
       </div>
       <div class="map3d" data-map3d>
         <div class="map3d-canvas" id="map3d" role="region" aria-label="Harta 3D cu traseele de livrare"></div>
@@ -429,20 +317,20 @@
     <section class="section" id="cum-comanzi" aria-labelledby="pasi-titlu">
       <div class="wrap">
         <div class="section-head">
-          <h2 id="pasi-titlu">Cum comanzi</h2>
+          <h2 id="pasi-titlu" data-text="steps.title">Cum comanzi</h2>
         </div>
         <ol class="steps">
           <li>
-            <h3>Ne spui ce îți dorești</h3>
-            <p>Ocazia, culorile preferate și bugetul. Ne suni, ne scrii pe WhatsApp sau treci pe la florărie.</p>
+            <h3 data-text="steps.1.title">Ne spui ce îți dorești</h3>
+            <p data-text="steps.1.text">Ocazia, culorile preferate și bugetul. Ne suni, ne scrii pe WhatsApp sau treci pe la florărie.</p>
           </li>
           <li>
-            <h3>Compunem aranjamentul</h3>
-            <p>Alegem florile potrivite și îți confirmăm prețul înainte să ne apucăm de lucru.</p>
+            <h3 data-text="steps.2.title">Compunem aranjamentul</h3>
+            <p data-text="steps.2.text">Alegem florile potrivite și îți confirmăm prețul înainte să ne apucăm de lucru.</p>
           </li>
           <li>
-            <h3>Îl ridici sau ți-l aducem</h3>
-            <p>Treci pe Str. 1 Decembrie 1918, bl. 65, parter, sau îl livrăm noi, cu mașina florăriei, la adresa dorită.</p>
+            <h3 data-text="steps.3.title">Îl ridici sau ți-l aducem</h3>
+            <p data-text="steps.3.text">Treci pe Str. 1 Decembrie 1918, bl. 65, parter, sau îl livrăm noi, cu mașina florăriei, la adresa dorită.</p>
           </li>
         </ol>
       </div>
@@ -452,8 +340,8 @@
     <section class="order" id="comanda" aria-labelledby="comanda-titlu">
       <div class="wrap order-inner">
         <div class="order-intro">
-          <h2 id="comanda-titlu">Comandă flori</h2>
-          <p>Completează câteva detalii și îți deschidem conversația pe WhatsApp cu mesajul gata scris. Noi îți răspundem cu propunerea și prețul.</p>
+          <h2 id="comanda-titlu" data-text="order.title">Comandă flori</h2>
+          <p data-text="order.text">Completează câteva detalii și îți deschidem conversația pe WhatsApp cu mesajul gata scris. Noi îți răspundem cu propunerea și prețul.</p>
           <p>Preferi să vorbim direct? Sună la <a href="#contact">0723 <span class="redact" aria-hidden="true">000 000</span></a>.</p>
           <p class="fine">Datele din formular nu sunt salvate pe site. Ajung doar în mesajul de WhatsApp pe care îl trimiți tu. Detalii în <a href="politica-de-confidentialitate.html">politica de confidențialitate</a>.</p>
         </div>
@@ -547,7 +435,7 @@
     <section class="section" id="contact" aria-labelledby="contact-titlu">
       <div class="wrap contact-inner">
         <div class="contact-info">
-          <h2 id="contact-titlu">Vino la florărie</h2>
+          <h2 id="contact-titlu" data-text="contact.title">Vino la florărie</h2>
           <p class="status status-dark" data-status hidden></p>
           <dl>
             <div>
@@ -588,7 +476,7 @@
       <div class="footer-brand">
         <img src="img/lotus.svg" alt="" width="48" height="36">
         <p class="footer-name">Florăria Bloom</p>
-        <p class="footer-tag">o floare, un zâmbet</p>
+        <p class="footer-tag" data-text="footer.tag">o floare, un zâmbet</p>
       </div>
       <nav class="footer-links" aria-label="Linkuri utile">
         <a href="politica-de-confidentialitate.html">Politica de confidențialitate</a>
@@ -643,6 +531,6 @@
     </div>
   </dialog>
 
-  <script src="js/main.js?v=13" defer></script>
+  <script src="js/main.js?v=14" defer></script>
 </body>
 </html>
