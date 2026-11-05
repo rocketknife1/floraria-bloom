@@ -34,7 +34,9 @@
     "steps.3.title": "Îl ridici sau ți-l aducem",
     "steps.3.text": "Treci pe Str. 1 Decembrie 1918, bl. 65, parter, sau îl livrăm noi, cu mașina florăriei, la adresa dorită.",
     "order.title": "Comandă flori",
-    "order.text": "Completează câteva detalii și îți deschidem conversația pe WhatsApp cu mesajul gata scris. Noi îți răspundem cu propunerea și prețul.",
+    "order.text": "Apeși pe ce îți trebuie, iar la final se deschide WhatsApp cu mesajul gata scris. Noi îți răspundem cu propunerea și prețul.",
+    "live.title": "Ce pregătim acum",
+    "live.text": "Comenzile la care lucrăm în florărie chiar acum. Fără nume: doar ce, pentru când și unde ajung.",
     "contact.title": "Vino la florărie",
     "footer.tag": "o floare, un zâmbet"
   },
@@ -449,5 +451,6 @@
       "hum": "50–60%",
       "light": "medie"
     }
-  ]
+  ],
+  "comenzi": []
 }

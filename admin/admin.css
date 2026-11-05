@@ -251,7 +251,7 @@ input:focus, textarea:focus, select:focus { outline: 2px solid color-mix(in srgb
 .item-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .item-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .item-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.item-sub { color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item-sub { color: var(--muted); font-size: 13px; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
 .item-body { padding: 4px 14px 14px; border-top: 1px solid var(--line); }
 .item-body > .fields { padding-top: 12px; }
 .item-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line); }
@@ -386,3 +386,32 @@ input:focus, textarea:focus, select:focus { outline: 2px solid color-mix(in srgb
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ---- butoane mari de ales (select cu display: "chips", zile rapide) ---- */
+
+.choice-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.choice {
+  flex: 1 1 auto;
+  min-height: 48px;
+  padding: 10px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  font: inherit;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+.choice:hover { border-color: var(--accent); }
+.choice.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.date-quick { display: flex; flex-direction: column; gap: 8px; }
+
+/* starea pe rândul fiecărui element (itemQuick): se schimbă fără să-l deschizi */
+.item-quick { padding: 0 12px 12px; }
+.item-quick .choice { min-height: 44px; padding: 8px 12px; font-size: 15px; }
+.item.state-cerere { border-left: 5px solid #d08a00; }
+.item.state-cerere .item-quick .choice.on { background: #d08a00; border-color: #d08a00; }
+.item.state-lucru { border-left: 5px solid var(--accent); }
+.item.state-gata { border-left: 5px solid var(--ok); }
+.item.state-gata .item-quick .choice.on { background: var(--ok); border-color: var(--ok); }
+.item.state-gata .item-title { color: var(--muted); }

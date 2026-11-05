@@ -10,6 +10,158 @@
       "path": "content.json",
       "sections": [
         {
+          "key": "comenzi",
+          "label": "Comenzi",
+          "description": "Cererile primite pe WhatsApp sau la telefon. Apeși „+ Comandă nouă”, alegi cu câteva atingeri și apeși Salvează. Pe site, în „Ce pregătim acum”, apar doar cele „În lucru” și trec singure la livrate la 30 de minute după intervalul lor. Tot ce scrii aici se vede pe site: fără nume, telefoane sau adrese.",
+          "type": "list",
+          "open": true,
+          "newItemFirst": true,
+          "addLabel": "+ Comandă nouă",
+          "itemTitle": "tip",
+          "itemSubtitle": "ce",
+          "itemDetails": [
+            "zi",
+            "interval",
+            "unde"
+          ],
+          "itemQuick": "stare",
+          "newItem": {
+            "stare": "cerere",
+            "tip": "buchet",
+            "ce": "",
+            "zi": "",
+            "interval": "oricand",
+            "unde": "ridicare"
+          },
+          "fields": [
+            {
+              "key": "stare",
+              "label": "Stare",
+              "type": "select",
+              "display": "chips",
+              "required": true,
+              "description": "„În lucru” o arată pe site.",
+              "options": [
+                {
+                  "value": "cerere",
+                  "label": "Cerere nouă"
+                },
+                {
+                  "value": "lucru",
+                  "label": "În lucru"
+                },
+                {
+                  "value": "gata",
+                  "label": "Gata"
+                }
+              ]
+            },
+            {
+              "key": "tip",
+              "label": "Ce fel",
+              "type": "select",
+              "display": "chips",
+              "required": true,
+              "options": [
+                {
+                  "value": "buchet",
+                  "label": "Buchet"
+                },
+                {
+                  "value": "cutie",
+                  "label": "Cutie cu flori"
+                },
+                {
+                  "value": "cos",
+                  "label": "Coș cu flori"
+                },
+                {
+                  "value": "planta",
+                  "label": "Plantă"
+                },
+                {
+                  "value": "aranjament",
+                  "label": "Aranjament"
+                }
+              ]
+            },
+            {
+              "key": "ce",
+              "label": "Pe scurt, ce anume",
+              "type": "text",
+              "placeholder": "ex. trandafiri roșii, 25 de fire",
+              "description": "Apare pe site. Fără nume sau telefon."
+            },
+            {
+              "key": "zi",
+              "label": "Pentru ce zi",
+              "type": "date",
+              "quickDays": true,
+              "required": true
+            },
+            {
+              "key": "interval",
+              "label": "Când în ziua aceea",
+              "type": "select",
+              "display": "chips",
+              "options": [
+                {
+                  "value": "dimineata",
+                  "label": "Dimineața (10–13)"
+                },
+                {
+                  "value": "dupa-amiaza",
+                  "label": "După-amiaza (13–16)"
+                },
+                {
+                  "value": "seara",
+                  "label": "Seara (16–19)"
+                },
+                {
+                  "value": "oricand",
+                  "label": "Oricând"
+                }
+              ]
+            },
+            {
+              "key": "unde",
+              "label": "Unde ajung",
+              "type": "select",
+              "display": "chips",
+              "options": [
+                {
+                  "value": "ridicare",
+                  "label": "Se ridică din florărie"
+                },
+                {
+                  "value": "Petroșani",
+                  "label": "Petroșani"
+                },
+                {
+                  "value": "Petrila",
+                  "label": "Petrila"
+                },
+                {
+                  "value": "Aninoasa",
+                  "label": "Aninoasa"
+                },
+                {
+                  "value": "Vulcan",
+                  "label": "Vulcan"
+                },
+                {
+                  "value": "Lupeni",
+                  "label": "Lupeni"
+                },
+                {
+                  "value": "Uricani",
+                  "label": "Uricani"
+                }
+              ]
+            }
+          ]
+        },
+        {
           "key": "gallery",
           "label": "Galerie (buchete, cutii, coșuri)",
           "description": "Lucrările din cele trei rânduri de poze.",
@@ -595,5 +747,75 @@
         }
       ]
     }
-  ]
+  ],
+  "demo": {
+    "content.json": {
+      "comenzi": [
+        {
+          "stare": "cerere",
+          "tip": "buchet",
+          "ce": "ceva alb, pentru botez",
+          "zi": "@+1",
+          "interval": "oricand",
+          "unde": "Lupeni"
+        },
+        {
+          "stare": "lucru",
+          "tip": "buchet",
+          "ce": "trandafiri roșii, 25 de fire",
+          "zi": "@+0",
+          "interval": "dupa-amiaza",
+          "unde": "Petrila"
+        },
+        {
+          "stare": "lucru",
+          "tip": "cutie",
+          "ce": "bujori roz, cu bilețel",
+          "zi": "@+0",
+          "interval": "seara",
+          "unde": "ridicare"
+        },
+        {
+          "stare": "lucru",
+          "tip": "cos",
+          "ce": "flori de câmp, pentru o aniversare",
+          "zi": "@+1",
+          "interval": "dimineata",
+          "unde": "Vulcan"
+        },
+        {
+          "stare": "lucru",
+          "tip": "planta",
+          "ce": "orhidee albă în ghiveci",
+          "zi": "@+1",
+          "interval": "seara",
+          "unde": "Petroșani"
+        },
+        {
+          "stare": "cerere",
+          "tip": "aranjament",
+          "ce": "aranjament de masă, nuanțe calde",
+          "zi": "@+2",
+          "interval": "dimineata",
+          "unde": "ridicare"
+        },
+        {
+          "stare": "gata",
+          "tip": "buchet",
+          "ce": "gerbera colorate",
+          "zi": "@+0",
+          "interval": "dimineata",
+          "unde": "Aninoasa"
+        },
+        {
+          "stare": "gata",
+          "tip": "cutie",
+          "ce": "trandafiri albi",
+          "zi": "@+0",
+          "interval": "dimineata",
+          "unde": "Petroșani"
+        }
+      ]
+    }
+  }
 }

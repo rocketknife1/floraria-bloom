@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Marcellus&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=13">
+  <link rel="stylesheet" href="css/style.css?v=14">
 
   <script type="application/ld+json">
   {
@@ -336,97 +336,88 @@
       </div>
     </section>
 
+    <!-- Ce pregătim acum: comenzile „în lucru” din content.json (doar ce, când și localitatea, fără nume) -->
+    <section class="section live-orders" id="in-lucru" aria-labelledby="in-lucru-titlu" data-live-orders hidden>
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="in-lucru-titlu" data-text="live.title">Ce pregătim acum</h2>
+          <p data-text="live.text">Comenzile la care lucrăm în florărie chiar acum. Fără nume: doar ce, pentru când și unde ajung.</p>
+        </div>
+        <p class="live-stats" data-live-stats></p>
+        <ul class="live-list" data-live-list></ul>
+      </div>
+    </section>
+
     <!-- Order -->
     <section class="order" id="comanda" aria-labelledby="comanda-titlu">
       <div class="wrap order-inner">
         <div class="order-intro">
           <h2 id="comanda-titlu" data-text="order.title">Comandă flori</h2>
-          <p data-text="order.text">Completează câteva detalii și îți deschidem conversația pe WhatsApp cu mesajul gata scris. Noi îți răspundem cu propunerea și prețul.</p>
+          <p data-text="order.text">Apeși pe ce îți trebuie, iar la final se deschide WhatsApp cu mesajul gata scris. Noi îți răspundem cu propunerea și prețul.</p>
           <p>Preferi să vorbim direct? Sună la <a href="#contact">0723 <span class="redact" aria-hidden="true">000 000</span></a>.</p>
           <p class="fine">Datele din formular nu sunt salvate pe site. Ajung doar în mesajul de WhatsApp pe care îl trimiți tu. Detalii în <a href="politica-de-confidentialitate.html">politica de confidențialitate</a>.</p>
         </div>
 
-        <form class="order-form" id="order-form" novalidate>
-          <fieldset class="segmented">
-            <legend>Cum ajung florile la tine</legend>
-            <label><input type="radio" name="predare" value="ridicare" checked><span>Ridic din florărie</span></label>
-            <label><input type="radio" name="predare" value="livrare"><span>Livrare acasă</span></label>
+        <!-- Comanda cu atingeri: alegi, apoi WhatsApp se deschide cu mesajul gata scris (nimic nu se salvează pe site) -->
+        <form class="order-form easy-order" id="order-form" novalidate>
+          <fieldset class="ask-group">
+            <legend><span class="ask-n">1</span> Ce vrei?</legend>
+            <div class="pick-tiles">
+              <label class="pick-tile"><input type="radio" name="tip" value="Buchet"><img src="img/buchet-culori-calde.jpg" alt="" loading="lazy"><span>Buchet</span></label>
+              <label class="pick-tile"><input type="radio" name="tip" value="Cutie cu flori"><img src="img/cutie-roz-bujori.jpg" alt="" loading="lazy"><span>Cutie cu flori</span></label>
+              <label class="pick-tile"><input type="radio" name="tip" value="Coș cu flori"><img src="img/cos-flori-colorat.jpg" alt="" loading="lazy"><span>Coș cu flori</span></label>
+              <label class="pick-tile"><input type="radio" name="tip" value="Ce ne recomandați voi"><span class="pick-icon" aria-hidden="true">✿</span><span>Alegeți voi</span></label>
+            </div>
+            <p class="picked-like" id="f-like" hidden><span></span> <button type="button" aria-label="Scoate">✕</button></p>
           </fieldset>
 
-          <div class="delivery-fields" id="delivery-fields" hidden>
-            <div class="field-row">
-              <div class="field">
-                <label for="f-zona">Zona de livrare</label>
-                <select id="f-zona" name="zona" data-zone-select></select>
-              </div>
-              <div class="field">
-                <label for="f-interval">Interval orar</label>
-                <select id="f-interval" name="interval">
-                  <option>Dimineața (10–13)</option>
-                  <option>După-amiaza (13–16)</option>
-                  <option>Seara (16–19)</option>
-                  <option>Oricând în ziua respectivă</option>
-                </select>
-              </div>
+          <fieldset class="ask-group">
+            <legend><span class="ask-n">2</span> Pentru când?</legend>
+            <div class="pick-chips">
+              <label><input type="radio" name="cand" value="azi"><span>Azi</span></label>
+              <label><input type="radio" name="cand" value="maine"><span>Mâine</span></label>
+              <label><input type="radio" name="cand" value="alta"><span>Altă zi</span></label>
             </div>
-            <div class="field">
-              <label for="f-adresa">Adresa de livrare</label>
-              <input id="f-adresa" name="adresa" type="text" autocomplete="street-address" placeholder="Strada, numărul, blocul, apartamentul">
-              <p class="error" id="f-adresa-err" hidden>Scrie adresa la care livrăm.</p>
-            </div>
-          </div>
+            <input class="pick-date" id="f-data" name="data" type="date" aria-label="Ziua" hidden>
+            <p class="hint" id="f-data-hint" hidden></p>
+          </fieldset>
 
-          <div class="field-row">
-            <div class="field">
-              <label for="f-nume">Numele tău</label>
-              <input id="f-nume" name="nume" type="text" autocomplete="name" required>
-              <p class="error" id="f-nume-err" hidden>Scrie-ne numele tău, ca să știm cui răspundem.</p>
+          <fieldset class="ask-group">
+            <legend><span class="ask-n">3</span> Cum ajung florile la tine?</legend>
+            <div class="pick-chips pick-two">
+              <label><input type="radio" name="predare" value="ridicare" checked><span>Le ridic din florărie</span></label>
+              <label><input type="radio" name="predare" value="livrare"><span>Livrare acasă</span></label>
             </div>
-            <div class="field">
-              <label for="f-tel">Telefon</label>
-              <input id="f-tel" name="telefon" type="tel" autocomplete="tel" inputmode="tel" placeholder="07xx xxx xxx" required>
-              <p class="error" id="f-tel-err" hidden>Scrie un număr de telefon valid, de exemplu 0723 <span class="redact" aria-hidden="true">000 000</span>.</p>
+            <div class="delivery-fields" id="delivery-fields" hidden>
+              <div class="pick-chips pick-zones" data-zone-chips aria-label="Localitatea"></div>
+              <div class="pick-chips">
+                <label><input type="radio" name="interval" value="dimineața (10–13)" checked><span>Dimineața <small>10–13</small></span></label>
+                <label><input type="radio" name="interval" value="după-amiaza (13–16)"><span>După-amiaza <small>13–16</small></span></label>
+                <label><input type="radio" name="interval" value="seara (16–19)"><span>Seara <small>16–19</small></span></label>
+                <label><input type="radio" name="interval" value="oricând în ziua aceea"><span>Oricând <small>10–19</small></span></label>
+              </div>
+              <input class="pick-text" id="f-adresa" name="adresa" type="text" autocomplete="street-address" placeholder="Adresa (o putem stabili și pe WhatsApp)">
             </div>
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label for="f-tip">Ce dorești</label>
-              <select id="f-tip" name="tip">
-                <option>Buchet</option>
-                <option>Cutie cu flori</option>
-                <option>Coș cu flori</option>
-                <option>Aranjament pentru eveniment</option>
-                <option>Nu știu încă, vreau o recomandare</option>
-              </select>
+          </fieldset>
+
+          <fieldset class="ask-group">
+            <legend><span class="ask-n">4</span> Cam cât să coste? <span class="opt">(dacă vrei)</span></legend>
+            <div class="pick-chips">
+              <label><input type="radio" name="buget" value="până în 150 lei"><span>Până în 150</span></label>
+              <label><input type="radio" name="buget" value="150–250 lei"><span>150–250</span></label>
+              <label><input type="radio" name="buget" value="250–400 lei"><span>250–400</span></label>
+              <label><input type="radio" name="buget" value="peste 400 lei"><span>Peste 400</span></label>
             </div>
-            <div class="field">
-              <label for="f-buget">Buget aproximativ</label>
-              <select id="f-buget" name="buget">
-                <option>Până în 150 lei</option>
-                <option>150–250 lei</option>
-                <option>250–400 lei</option>
-                <option>Peste 400 lei</option>
-                <option>Vreau să discutăm</option>
-              </select>
-            </div>
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label for="f-ocazie">Ocazia <span class="opt">(opțional)</span></label>
-              <input id="f-ocazie" name="ocazie" type="text" placeholder="Aniversare, nuntă, mulțumire…">
-            </div>
-            <div class="field">
-              <label for="f-data">Pentru ce dată</label>
-              <input id="f-data" name="data" type="date" required>
-              <p class="error" id="f-data-err" hidden>Alege data la care ai nevoie de flori.</p>
-              <p class="hint" id="f-data-hint" hidden></p>
-            </div>
-          </div>
-          <div class="field">
-            <label for="f-mesaj">Detalii <span class="opt">(opțional)</span></label>
-            <textarea id="f-mesaj" name="mesaj" rows="4" placeholder="Culori preferate, flori pe care le iubește, un mesaj pentru bilețel…"></textarea>
-          </div>
-          <button class="btn btn-primary btn-block" type="submit">Trimite comanda pe WhatsApp</button>
+          </fieldset>
+
+          <details class="ask-more">
+            <summary>+ Vreau să mai spun ceva <span class="opt">(culori, mesaj pe bilețel…)</span></summary>
+            <textarea class="pick-text" id="f-mesaj" name="mesaj" rows="3" placeholder="Ex. roz și alb, pe bilețel: „La mulți ani, mama!”"></textarea>
+          </details>
+
+          <p class="error" id="f-err" role="alert" hidden></p>
+          <button class="btn btn-primary btn-block btn-send" type="submit">Trimite detaliile florăriei</button>
+          <p class="send-note">Se deschide WhatsApp cu mesajul gata scris. Tu doar apeși „Trimite”. Fără WhatsApp? <a href="#contact">Sună-ne</a>.</p>
         </form>
       </div>
     </section>
@@ -532,6 +523,6 @@
   </dialog>
 
   <script src="maintenance.js?v=1" defer data-brand="Florăria Bloom" data-bg="#261E33" data-fg="#F8F7FA" data-accent="#CFA021" data-font="Jost, system-ui, sans-serif" data-display="Marcellus, Georgia, serif"></script>
-  <script src="js/main.js?v=14" defer></script>
+  <script src="js/main.js?v=15" defer></script>
 </body>
 </html>

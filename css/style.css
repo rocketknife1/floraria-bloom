@@ -637,6 +637,96 @@ p { margin: 0; }
 .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--plum); box-shadow: 0 0 0 3px var(--lilac-deep); }
 .field [aria-invalid="true"] { border-color: var(--error); }
 .error { color: var(--error); font-size: .9rem; }
+.error[hidden] { display: none; }
+
+/* Comanda cu atingeri: butoane mari, ușor de nimerit și pentru bunici */
+.easy-order { gap: 26px; }
+.ask-group { margin: 0; padding: 0; border: 0; display: grid; gap: 12px; min-width: 0; }
+.ask-group legend { padding: 0; margin-bottom: 12px; font-family: var(--display); font-size: 1.3rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ask-group legend .opt { font-family: var(--body); font-size: .95rem; }
+.ask-n {
+  flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--plum); color: #fff; font-family: var(--body); font-size: .95rem; font-weight: 500;
+}
+.pick-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.pick-tile { position: relative; cursor: pointer; display: grid; grid-template-rows: auto auto; border-radius: 12px; overflow: hidden; background: #fff; border: 2px solid var(--line); transition: border-color .2s, box-shadow .2s, transform .2s; }
+.pick-tile input, .pick-chips input { position: absolute; opacity: 0; pointer-events: none; }
+.pick-tile img, .pick-icon { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; }
+.pick-icon { display: grid; place-items: center; font-size: 2.6rem; color: var(--mauve); background: var(--mist); }
+.pick-tile > span:last-child { padding: 9px 6px 10px; text-align: center; font-weight: 500; font-size: .95rem; line-height: 1.2; }
+.pick-tile:hover { border-color: var(--mauve); }
+.pick-tile:has(input:checked) { border-color: var(--plum); box-shadow: 0 0 0 3px var(--lilac-deep); transform: translateY(-2px); }
+.pick-tile:has(input:checked) > span:last-child { background: var(--plum); color: #fff; }
+.pick-tile:has(input:checked)::after {
+  content: "✓"; position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--plum); color: #fff; font-weight: 600;
+}
+.pick-tile:has(input:focus-visible), .pick-chips label:has(input:focus-visible) span { outline: 2px solid var(--mauve); outline-offset: 2px; }
+
+.pick-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.pick-chips label { cursor: pointer; flex: 1 1 auto; }
+.pick-chips span {
+  display: block; min-height: 52px; padding: 13px 18px; border-radius: 12px; text-align: center;
+  background: #fff; border: 2px solid var(--line); font-weight: 500; font-size: 1.02rem; line-height: 1.25;
+  transition: background-color .2s, border-color .2s, color .2s;
+}
+.pick-chips span small { display: block; font-weight: 400; font-size: .82rem; opacity: .75; }
+.pick-chips label:hover span { border-color: var(--mauve); }
+.pick-chips input:checked + span { background: var(--plum); border-color: var(--plum); color: #fff; }
+.pick-two label { flex: 1 1 0; }
+.pick-zones label { flex: 1 1 140px; }
+
+.pick-date, .pick-text {
+  width: 100%; min-height: 52px; padding: 12px 16px; font-size: 1.02rem;
+  border: 2px solid var(--line); border-radius: 12px; background: #fff;
+}
+.pick-date[hidden] { display: none; }
+textarea.pick-text { resize: vertical; margin-top: 10px; }
+.pick-date:focus, .pick-text:focus { outline: none; border-color: var(--plum); box-shadow: 0 0 0 3px var(--lilac-deep); }
+
+.picked-like { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 10px 10px 16px; border-radius: 12px; background: var(--mist); font-weight: 500; }
+.picked-like[hidden] { display: none; }
+.picked-like button { flex: none; width: 36px; height: 36px; border: 0; border-radius: 50%; background: #fff; color: var(--ink-soft); cursor: pointer; font-size: 1rem; }
+.picked-like button:hover { color: var(--error); }
+
+.ask-more summary { cursor: pointer; font-weight: 500; color: var(--plum); padding: 6px 0; list-style: none; }
+.ask-more summary::-webkit-details-marker { display: none; }
+.ask-more[open] summary { color: var(--ink); }
+
+.btn-send { min-height: 60px; font-size: 1.15rem; border-radius: 14px; }
+.send-note { margin-top: -12px; text-align: center; font-size: .92rem; color: var(--ink-soft); }
+.send-note a { font-weight: 500; }
+
+@media (max-width: 560px) {
+  .pick-tiles { grid-template-columns: 1fr 1fr; }
+  .pick-tile img, .pick-icon { aspect-ratio: 4 / 3; }
+  .pick-chips label { flex: 1 1 40%; }
+  .pick-two label { flex: 1 1 100%; }
+}
+
+/* Ce pregătim acum: comenzile puse „în lucru” din panou */
+.live-orders { background: var(--card); padding-block: calc(var(--section) * .7); }
+.live-orders[hidden] { display: none; }
+.live-stats { display: flex; flex-wrap: wrap; gap: 10px; margin: -16px 0 22px; }
+.live-stats:empty { display: none; }
+.live-stats span { padding: 8px 16px; border-radius: 999px; background: var(--lilac); font-size: .95rem; }
+.live-stats b { font-family: var(--display); font-weight: 400; font-size: 1.15rem; color: var(--plum); margin-right: 2px; }
+.live-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 12px; }
+.live-list:empty { display: none; }
+.live-item { display: grid; grid-template-columns: 64px 1fr auto; align-items: center; gap: 14px; padding: 10px 16px 10px 10px; border-radius: 14px; background: #fff; box-shadow: 0 10px 24px -20px rgba(38, 30, 51, .6); }
+.live-item img { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; }
+.live-item div { min-width: 0; }
+.live-item span { display: block; margin-top: 2px; font-size: .92rem; color: var(--ink-soft); }
+.live-item em {
+  font-style: normal; font-size: .82rem; font-weight: 500; color: var(--gold-text); white-space: nowrap;
+  padding: 5px 10px 5px 22px; border-radius: 999px; background: #FBF3DC; position: relative;
+}
+.live-item em::before {
+  content: ""; position: absolute; left: 9px; top: 50%; width: 7px; height: 7px; margin-top: -3.5px; border-radius: 50%;
+  background: var(--gold); animation: live-pulse 1.6s ease-in-out infinite;
+}
+@keyframes live-pulse { 50% { opacity: .25; transform: scale(.7); } }
+@media (prefers-reduced-motion: reduce) { .live-item em::before { animation: none; } }
 
 /* Contact */
 .contact-inner { display: grid; grid-template-columns: 5fr 7fr; gap: clamp(32px, 6vw, 80px); align-items: center; }

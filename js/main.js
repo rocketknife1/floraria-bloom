@@ -154,10 +154,10 @@
     `Livrare gratuită în Petroșani pentru comenzile de peste ${CONFIG.delivery.freeOverLei} lei. Livrăm de ${DAYS[CONFIG.delivery.days[0]]} până ${DAYS[CONFIG.delivery.days.at(-1)]}. Distanțele sunt pe drum, din fața florăriei.` +
     draftTag();
 
-  const zoneSelect = $("[data-zone-select]");
-  zoneSelect.innerHTML = zones
+  // localitățile din formularul de comandă: butoane mari, cu prețul livrării
+  $("[data-zone-chips]").innerHTML = zones
     .filter((z) => !z.pickup)
-    .map((z) => `<option value="${z.name}">${z.name} (${lei(z.price)})</option>`)
+    .map((z, i) => `<label><input type="radio" name="zona" value="${esc(z.name)}"${i === 0 ? " checked" : ""}><span>${esc(z.name)} <small>${lei(z.price)}</small></span></label>`)
     .join("");
 
   /* Same-day delivery countdown, from CONFIG.delivery */
@@ -286,21 +286,31 @@
     selectClimate(CLIMATE[0].id);
   }
 
-  /* Order form */
+  /* Order form: patru întrebări cu atingeri (ce, când, cum, cât), apoi WhatsApp
+   * se deschide cu mesajul gata scris, din partea clientului. Nu se scrie nici
+   * nume, nici telefon: WhatsApp le trimite oricum. Nimic nu se salvează pe site. */
   const form = $("#order-form");
-  const tip = $("#f-tip");
-  const mesaj = $("#f-mesaj");
   const data = $("#f-data");
-  const adresa = $("#f-adresa");
   const deliveryFields = $("#delivery-fields");
   const dataHint = $("#f-data-hint");
+  const formErr = $("#f-err");
+  const like = $("#f-like");
+  let likeItem = "";
   data.min = new Date().toISOString().slice(0, 10);
 
   const isDelivery = () => form.elements.predare.value === "livrare";
+  const chosenDate = () => {
+    const c = form.elements.cand.value;
+    const d = new Date();
+    if (c === "azi") return d;
+    if (c === "maine") return (d.setDate(d.getDate() + 1), d);
+    if (c === "alta" && data.value) return new Date(`${data.value}T12:00:00`);
+    return null;
+  };
   function updateDateHint() {
     dataHint.hidden = true;
-    if (!isDelivery() || !data.value) return;
-    const chosen = new Date(`${data.value}T12:00:00`);
+    const chosen = chosenDate();
+    if (!isDelivery() || !chosen) return;
     const now = new Date();
     if (!CONFIG.delivery.days.includes(chosen.getDay())) {
       dataHint.textContent = `${cap(DAYS[chosen.getDay()])} nu livrăm. Alege altă zi sau ridică florile din florărie.`;
@@ -312,72 +322,127 @@
   }
   const syncDelivery = () => {
     deliveryFields.hidden = !isDelivery();
+    data.hidden = form.elements.cand.value !== "alta";
     updateDateHint();
   };
-  $$('input[name="predare"]').forEach((r) => r.addEventListener("change", syncDelivery));
-  data.addEventListener("change", updateDateHint);
+  form.addEventListener("change", (e) => {
+    formErr.hidden = true;
+    syncDelivery();
+    if (e.target.name === "cand" && e.target.value === "alta") data.focus({ preventScroll: true });
+  });
 
+  // „Vreau unul asemănător” din galerie: tipul se bifează singur, iar mesajul spune ce poză i-a plăcut
   function prefill(item, type) {
-    tip.value = TYPE_LABEL[type] ?? tip.value;
-    const line = `Aș vrea ceva asemănător cu „${item}”.`;
-    if (!mesaj.value.includes(line)) mesaj.value = line + (mesaj.value ? `\n${mesaj.value}` : "");
-    setTimeout(() => $("#f-nume").focus({ preventScroll: true }), 500);
+    const radio = [...form.elements.tip].find((r) => r.value === TYPE_LABEL[type]);
+    if (radio) radio.checked = true;
+    likeItem = item;
+    $("span", like).textContent = `Asemănător cu „${item}”`;
+    like.hidden = false;
+    formErr.hidden = true;
   }
   $$(".ask").forEach((a) => a.addEventListener("click", () => prefill(a.dataset.item, a.closest("li").dataset.type)));
+  $("button", like).addEventListener("click", () => { likeItem = ""; like.hidden = true; });
 
   // "Comandă cu livrare aici" from the 3D map
   function orderTo(zone) {
-    form.elements.predare.value = "livrare";
     $('input[name="predare"][value="livrare"]').checked = true;
+    const radio = [...form.elements.zona].find((r) => r.value === zone.name);
+    if (radio) radio.checked = true;
     syncDelivery();
-    zoneSelect.value = zone.name;
-    setTimeout(() => adresa.focus({ preventScroll: true }), 600);
   }
-
-  const checks = [
-    { el: $("#f-nume"), ok: (v) => v.trim().length >= 2 },
-    { el: $("#f-tel"), ok: (v) => v.replace(/[^\d]/g, "").length >= 10 },
-    { el: data, ok: (v) => Boolean(v) },
-    { el: adresa, ok: (v) => !isDelivery() || v.trim().length >= 5 },
-  ];
-  const validate = ({ el, ok }) => {
-    const valid = ok(el.value);
-    el.setAttribute("aria-invalid", String(!valid));
-    const err = $(`#${el.id}-err`);
-    err.hidden = valid;
-    if (valid) el.removeAttribute("aria-describedby");
-    else el.setAttribute("aria-describedby", err.id);
-    return valid;
-  };
-  checks.forEach((c) => c.el.addEventListener("blur", () => { if (c.el.value) validate(c); }));
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const bad = checks.filter((c) => !validate(c));
-    if (bad.length) { bad[0].el.focus(); return; }
-
     const v = Object.fromEntries(new FormData(form));
-    const date = new Date(`${v.data}T12:00:00`).toLocaleDateString("ro-RO", { weekday: "long", day: "numeric", month: "long" });
+    const when = chosenDate();
+    const missing = !v.tip ? "Alege ce vrei (pasul 1)." : v.cand === "alta" && !when ? "Alege ziua din calendar (pasul 2)." : !when ? "Alege pentru când (pasul 2)." : null;
+    if (missing) {
+      formErr.textContent = missing;
+      formErr.hidden = false;
+      formErr.scrollIntoView({ block: "center", behavior: reduceMotion ? "auto" : "smooth" });
+      return;
+    }
+    const day = when.toLocaleDateString("ro-RO", { weekday: "long", day: "numeric", month: "long" });
+    const relative = v.cand === "azi" ? "azi, " : v.cand === "maine" ? "mâine, " : "";
     const lines = [
-      "Bună ziua! Aș dori să comand flori.",
+      "Bună ziua! Aș dori flori de la Florăria Bloom.",
       "",
-      `Ce doresc: ${v.tip}`,
-      v.ocazie.trim() ? `Ocazia: ${v.ocazie.trim()}` : null,
-      `Pentru data: ${date}`,
-      `Buget: ${v.buget}`,
+      `• Ce: ${v.tip}${likeItem ? ` (asemănător cu „${likeItem}”)` : ""}`,
+      `• Când: ${relative}${day}`,
       v.predare === "livrare"
-        ? `Livrare la domiciliu: ${v.zona}, ${v.adresa.trim()}, ${v.interval.toLowerCase()}`
-        : "Le ridic din florărie",
-      v.mesaj.trim() ? `Detalii: ${v.mesaj.trim()}` : null,
-      "",
-      `Nume: ${v.nume.trim()}`,
-      `Telefon: ${v.telefon.trim()}`,
+        ? `• Livrare în ${v.zona}, ${v.interval}${v.adresa.trim() ? `, la adresa: ${v.adresa.trim()}` : ""}`
+        : "• Le ridic din florărie",
+      v.buget ? `• Buget: ${v.buget}` : null,
+      v.mesaj.trim() ? `• Detalii: ${v.mesaj.trim()}` : null,
     ];
     const text = lines.filter((l) => l !== null).join("\n");
     const url = `https://wa.me/${CONFIG.phoneWa}?text=${encodeURIComponent(text)}`;
     if (matchMedia("(pointer: coarse)").matches) location.href = url;
     else window.open(url, "_blank", "noopener");
   });
+
+  /* Ce pregătim acum: comenzile puse „în lucru” din panoul de administrare.
+   * Pe site apar doar ce, pentru când și localitatea. O comandă se socotește
+   * livrată singură la 30 de minute după intervalul ei, fără server: ora se
+   * compară aici, în pagină. Cu ?demo se văd comenzile de probă din schemă. */
+  const liveSection = $("[data-live-orders]");
+  if (liveSection) {
+    let orders = CONTENT.comenzi ?? [];
+    if (new URLSearchParams(location.search).has("demo")) {
+      try {
+        const schema = await (await fetch("admin/schema.json", { cache: "no-store" })).json();
+        orders = withDates(schema.demo?.["content.json"]?.comenzi ?? []);
+      } catch {}
+    }
+    renderLiveOrders(orders);
+  }
+
+  function renderLiveOrders(all) {
+    const now = new Date();
+    const SLOT = { dimineata: ["dimineața", "13:00"], "dupa-amiaza": ["după-amiaza", "16:00"], seara: ["seara", "19:00"], oricand: ["", "19:00"] };
+    const KIND = {
+      buchet: ["Buchet", "img/buchet-culori-calde.jpg"],
+      cutie: ["Cutie cu flori", "img/cutie-roz-bujori.jpg"],
+      cos: ["Coș cu flori", "img/cos-flori-colorat.jpg"],
+      planta: ["Plantă", "img/zona-verzi.jpg"],
+      aranjament: ["Aranjament", "img/bloom-coperta.jpg"],
+    };
+    const endOf = (o) => new Date(new Date(`${o.zi}T${(SLOT[o.interval] ?? SLOT.oricand)[1]}:00`).getTime() + 30 * 60000);
+    const orders = all.filter((o) => o && !o.hidden && /^\d{4}-\d{2}-\d{2}$/.test(o.zi ?? ""));
+    const working = orders.filter((o) => o.stare === "lucru" && now < endOf(o)).sort((a, b) => endOf(a) - endOf(b));
+    const isToday = (o) => new Date(`${o.zi}T12:00:00`).toDateString() === now.toDateString();
+    const doneToday = orders.filter((o) => isToday(o) && (o.stare === "gata" || (o.stare === "lucru" && now >= endOf(o)))).length;
+    liveSection.hidden = !working.length && !doneToday;
+    if (liveSection.hidden) return;
+    const dayWord = (o) => {
+      const d = new Date(`${o.zi}T12:00:00`);
+      const diff = Math.round((d.setHours(0, 0, 0, 0) - new Date(now).setHours(0, 0, 0, 0)) / 86400000);
+      return diff === 0 ? "azi" : diff === 1 ? "mâine" : new Date(`${o.zi}T12:00:00`).toLocaleDateString("ro-RO", { weekday: "long", day: "numeric", month: "long" });
+    };
+    $("[data-live-stats]").innerHTML = [
+      working.length ? `<span><b>${working.length}</b> ${working.length === 1 ? "comandă" : "comenzi"} în lucru</span>` : "",
+      doneToday ? `<span><b>${doneToday}</b> ${doneToday === 1 ? "livrată" : "livrate"} azi</span>` : "",
+    ].join("");
+    $("[data-live-list]").innerHTML = working
+      .map((o) => {
+        const [label, img] = KIND[o.tip] ?? KIND.buchet;
+        const part = (SLOT[o.interval] ?? SLOT.oricand)[0];
+        const where = !o.unde || o.unde === "ridicare" ? "se ridică din florărie" : `livrare în ${o.unde}`;
+        return `<li class="live-item"><img src="${img}" alt="" loading="lazy"><div><b>${esc(label)}</b>${o.ce ? ` · ${esc(o.ce)}` : ""}<span>Pentru ${esc(dayWord(o))}${part ? `, ${part}` : ""} · ${esc(where)}</span></div><em>în lucru</em></li>`;
+      })
+      .join("");
+  }
+
+  /** Datele de probă scriu ziua ca „@+1” (mâine): aici devine o dată adevărată. */
+  function withDates(list) {
+    return list.map((o) => {
+      const m = /^@([+-]\d+)$/.exec(o.zi ?? "");
+      if (!m) return o;
+      const d = new Date();
+      d.setDate(d.getDate() + Number(m[1]));
+      return { ...o, zi: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}` };
+    });
+  }
 
   $("#an").textContent = new Date().getFullYear();
 

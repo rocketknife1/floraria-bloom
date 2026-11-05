@@ -215,6 +215,25 @@ class GitHub {
   }
 }
 
+/**
+ * Date de probă pentru demo, din schema.json („demo”: { "content.json": { "comenzi": […] } }):
+ * înlocuiesc cheile acelea doar în copia din pagină. Zilele scrise „@+0”, „@+1”, „@-1”
+ * devin azi, mâine, ieri, ca demo-ul să arate mereu comenzi de acum.
+ */
+function withDemoData(path, bytes) {
+  const extra = state.schema?.demo?.[path];
+  if (!extra || !path.endsWith(".json")) return bytes;
+  const days = (v) =>
+    typeof v === "string" && /^@[+-]\d+$/.test(v) ? dayFromToday(Number(v.slice(1))) : Array.isArray(v) ? v.map(days) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, days(x)])) : v;
+  try {
+    const json = JSON.parse(new TextDecoder().decode(bytes));
+    Object.assign(json, days(structuredClone(extra)));
+    return new TextEncoder().encode(`${JSON.stringify(json, null, 2)}\n`);
+  } catch {
+    return bytes;
+  }
+}
+
 /** În demo: fișierele vin de pe site, iar „commit-urile” rămân în pagină. */
 class Demo {
   constructor() {
@@ -235,7 +254,7 @@ class Demo {
     if (!this.files.has(path)) {
       const res = await fetch(new URL(path, SITE_ROOT), { cache: "no-store" });
       if (!res.ok) throw new AdminError(`Nu găsesc „${path}” pe site.`, "missing");
-      this.files.set(path, new Uint8Array(await res.arrayBuffer()));
+      this.files.set(path, withDemoData(path, new Uint8Array(await res.arrayBuffer())));
       this.log.push({ sha: "original", message: "Cum era site-ul când ai deschis demo-ul", date: new Date(), files: new Map(this.files) });
     }
     return { sha: `demo-${this.log.length}`, bytes: this.files.get(path) };
@@ -643,6 +662,48 @@ function labelFor(def, input) {
   );
 }
 
+/** Ca labelFor, dar pentru un grup de butoane (un <label> ar apăsa singur primul buton). */
+function groupFor(def, content) {
+  return el(
+    "div",
+    { class: "field", role: "group", "aria-label": def.label },
+    el("span", { class: "field-label" }, def.label, def.required ? el("i", { class: "req", text: " *", title: "obligatoriu" }) : null),
+    def.description ? el("span", { class: "field-help", text: def.description }) : null,
+    content,
+  );
+}
+
+/** Butoane mari, o atingere și gata (select cu display: "chips", zile rapide la date). */
+function choiceChips(options, value, onPick) {
+  const box = el("div", { class: "choice-chips" });
+  const paint = (current) => {
+    for (const b of box.children) {
+      const on = b.dataset.value === String(current ?? "");
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", String(on));
+    }
+  };
+  for (const o of options) {
+    box.append(el("button", { type: "button", class: "choice", "data-value": String(o.value), onclick: () => (onPick(o.value), paint(o.value)) }, o.label));
+  }
+  paint(value);
+  box.paint = paint;
+  return box;
+}
+
+const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const dayFromToday = (n) => {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return isoDay(d);
+};
+/** „azi”, „mâine”, „ieri” sau „joi, 12 nov.”: cum își spun oamenii zilele. */
+function friendlyDay(iso) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso ?? "")) return iso ?? "";
+  const words = { [dayFromToday(0)]: "azi", [dayFromToday(1)]: "mâine", [dayFromToday(-1)]: "ieri" };
+  return words[iso] ?? new Date(`${iso}T12:00:00`).toLocaleDateString("ro-RO", { weekday: "short", day: "numeric", month: "short" });
+}
+
 function field(def, obj, update) {
   const set = (v) => {
     obj[def.key] = v;
@@ -651,7 +712,7 @@ function field(def, obj, update) {
   const v = obj[def.key] ?? def.default;
   switch (def.type) {
     case "text":
-      return labelFor(def, el("input", { type: "text", value: v ?? "", oninput: (e) => set(e.target.value) }));
+      return labelFor(def, el("input", { type: "text", value: v ?? "", placeholder: def.placeholder, oninput: (e) => set(e.target.value) }));
     case "longtext": {
       const ta = el("textarea", { rows: 3, oninput: (e) => (grow(e.target), set(e.target.value)) });
       ta.value = v ?? "";
@@ -693,14 +754,21 @@ function field(def, obj, update) {
           el("span", {}, el("input", { type: "text", list: id, value: v ?? "", oninput: (e) => set(e.target.value) }), el("datalist", { id }, options.map((o) => el("option", { value: o.value }, o.label)))),
         );
       }
+      if (def.display === "chips") return groupFor(def, choiceChips(options, v, set));
       const select = el("select", { onchange: (e) => set(e.target.value) }, options.map((o) => el("option", { value: String(o.value) }, o.label)));
       if (v != null && !options.some((o) => String(o.value) === String(v))) select.append(el("option", { value: String(v) }, String(v)));
       select.value = v == null ? "" : String(v);
       if (v == null) select.prepend(el("option", { value: "", disabled: true }, "Alege…")), (select.value = "");
       return labelFor(def, select);
     }
-    case "date":
-      return labelFor(def, el("input", { type: "date", value: v ?? "", onchange: (e) => set(e.target.value || null) }));
+    case "date": {
+      if (!def.quickDays) return labelFor(def, el("input", { type: "date", value: v ?? "", onchange: (e) => set(e.target.value || null) }));
+      // „Azi” / „Mâine” cu o atingere; calendarul rămâne pentru restul zilelor
+      const quick = [{ value: dayFromToday(0), label: "Azi" }, { value: dayFromToday(1), label: "Mâine" }, { value: dayFromToday(2), label: "Poimâine" }];
+      const input = el("input", { type: "date", value: v ?? "", "aria-label": "Altă zi", onchange: (e) => (set(e.target.value || null), chips.paint(e.target.value)) });
+      const chips = choiceChips(quick, v, (day) => ((input.value = day), set(day)));
+      return groupFor(def, el("div", { class: "date-quick" }, chips, input));
+    }
     case "time":
       return labelFor(def, el("input", { type: "time", value: v ?? "", onchange: (e) => set(e.target.value || null) }));
     case "color": {
@@ -943,17 +1011,27 @@ function listField(def, obj, update) {
   const box = el("div", { class: "list" });
   let filter = "";
 
-  const titleOf = (item, i) => {
-    const t = def.itemTitle ? valueAtPath(item, def.itemTitle) : null;
-    return typeof t === "string" && t.trim() ? t : `Element ${i + 1}`;
-  };
-  const subtitleOf = (item) => {
-    const s = def.itemSubtitle ? valueAtPath(item, def.itemSubtitle) : null;
+  // valoarea unui câmp așa cum o citește omul: eticheta opțiunii, „azi” în loc de 2026-11-05
+  const describe = (item, key) => {
+    const s = key ? valueAtPath(item, key) : null;
     if (s == null || s === "") return "";
-    const sub = (def.fields ?? []).find((f) => f.key === def.itemSubtitle);
-    const opt = sub?.options?.find((o) => String(o.value) === String(s));
-    return opt ? opt.label : String(s);
+    const f = (def.fields ?? []).find((x) => x.key === key);
+    const opt = f?.options?.find((o) => String(o.value) === String(s));
+    if (opt) return opt.label;
+    return f?.type === "date" ? friendlyDay(String(s)) : String(s);
   };
+  const titleOf = (item, i) => {
+    const t = describe(item, def.itemTitle);
+    return t.trim() ? t : `Element ${i + 1}`;
+  };
+  // itemDetails: câmpuri în plus pe rândul mic (doar în panoul web; aplicația îl ignoră)
+  const subtitleOf = (item) =>
+    [def.itemSubtitle, ...(def.itemDetails ?? [])]
+      .map((key) => describe(item, key))
+      .filter(Boolean)
+      .join(" · ");
+  // itemQuick: un câmp „select” cu butoanele direct pe rând, fără să deschizi elementul
+  const quick = def.itemQuick ? (def.fields ?? []).find((f) => f.key === def.itemQuick && f.type === "select") : null;
 
   const card = (item, i) => {
     const head = el("button", { type: "button", class: "item-head", "aria-expanded": String(openItems.has(item)) });
@@ -970,7 +1048,16 @@ function listField(def, obj, update) {
       );
     };
     paintHead();
-    const node = el("div", { class: `item${item.hidden ? " is-hidden" : ""}${openItems.has(item) ? " open" : ""}` }, head);
+    const node = el("div", { class: `item${item.hidden ? " is-hidden" : ""}${openItems.has(item) ? " open" : ""}${quick ? ` state-${slugify(String(item[quick.key] ?? ""))}` : ""}` }, head);
+    if (quick) {
+      node.append(
+        el("div", { class: "item-quick", role: "group", "aria-label": quick.label }, choiceChips(quick.options ?? [], item[quick.key], (val) => {
+          item[quick.key] = val;
+          render();
+          update();
+        })),
+      );
+    }
     const toggle = () => {
       if (openItems.has(item)) openItems.delete(item);
       else openItems.add(item);
@@ -1014,7 +1101,7 @@ function listField(def, obj, update) {
             }, "Șterge")
           : null,
       );
-      node.append(el("div", { class: "item-body" }, fieldsForm((def.fields ?? []).filter((f) => !(canHide && f.key === "hidden")), item, paintHead), actions));
+      node.append(el("div", { class: "item-body" }, fieldsForm((def.fields ?? []).filter((f) => !(canHide && f.key === "hidden") && f !== quick), item, paintHead), actions));
     }
     return node;
   };
@@ -1045,15 +1132,20 @@ function listField(def, obj, update) {
           class: "btn btn-add",
           onclick: () => {
             const item = structuredClone(def.newItem ?? {});
-            list.push(item);
+            // zilele cu butoane rapide pornesc de la „azi”
+            for (const f of (def.fields ?? []).filter((x) => x.type === "date" && x.quickDays && isEmpty(item[x.key]))) item[f.key] = dayFromToday(0);
+            if (def.newItemFirst) list.unshift(item);
+            else list.push(item);
             openItems.add(item);
             filter = search.value = "";
             render();
             update();
-            requestAnimationFrame(() => items.querySelector(".item.open:last-of-type, .item:last-of-type")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+            requestAnimationFrame(() => items.querySelector(def.newItemFirst ? ".item.open" : ".item.open:last-of-type, .item:last-of-type")?.scrollIntoView({ behavior: "smooth", block: "start" }));
           },
-        }, `+ Adaugă în „${def.label}”`),
+        }, def.addLabel ?? `+ Adaugă în „${def.label}”`),
       );
+      // comenzile noi stau sus: butonul de adăugat vine primul
+      if (def.newItemFirst) children.unshift(children.pop());
     }
     items.replaceChildren(...children);
   };
@@ -1078,7 +1170,7 @@ function renderEditor() {
       sections.append(
         el(
           "details",
-          { class: "section", id, open: state.files.length === 1 && f.def.sections.length <= 2 },
+          { class: "section", id, open: s.open === true || (state.files.length === 1 && f.def.sections.length <= 2) },
           el("summary", {}, el("span", { class: "section-title", text: s.label }), el("span", { class: "tag tag-changed", "data-badge": `${f.path}|${s.key}`, text: "modificat", hidden: true }), el("span", { class: "chevron", "aria-hidden": "true" })),
           s.description ? el("p", { class: "section-help", text: s.description }) : null,
           el("div", { class: "section-body" }, body),
@@ -1404,7 +1496,7 @@ async function start() {
   $("#site-name").textContent = schema.name;
   if (schema.accent) document.documentElement.style.setProperty("--accent", schema.accent);
   const live = $("#live-link");
-  live.href = DEMO ? "../" : schema.liveUrl || "../";
+  live.href = DEMO ? "../?demo" : schema.liveUrl || "../";
 
   $("#save").addEventListener("click", () => save().catch(() => {}));
   $("#discard").addEventListener("click", discard);

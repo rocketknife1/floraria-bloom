@@ -6,7 +6,22 @@
 - ascunde ce nu mai are (rămâne în listă, îl arată iar oricând), șterge, mută mai sus sau mai jos;
 - schimbă programul, telefonul, livrarea și toate textele;
 - pornește sau oprește mesajul de mentenanță;
-- readuce orice versiune salvată înainte (din „Istoric”).
+- readuce orice versiune salvată înainte (din „Istoric”);
+- ține lista de comenzi (vezi mai jos).
+
+## Comenzile (Florăria Bloom)
+
+Pe site, clientul alege cu atingeri (ce, când, cum ajung florile, buget) și apasă „Trimite detaliile florăriei”: se deschide WhatsApp cu mesajul gata scris, din partea lui. Site-ul nu salvează nimic și nu cere nume sau telefon (WhatsApp le trimite oricum).
+
+GitHub Pages nu poate primi date de la vizitatori, deci cererea nu intră singură în panou. Florarul o pune el, din secțiunea „Comenzi”:
+
+1. „+ Comandă nouă”, apoi atingeri: ce fel, pentru ce zi (Azi / Mâine), când, unde. Pornește ca „Cerere nouă” și nu apare pe site.
+2. Când se apucă de ea: „În lucru”, apoi „Salvează pe site”. Apare pe site, la „Ce pregătim acum” (doar ce, pentru când și localitatea).
+3. Nu mai trebuie apăsat nimic: la 30 de minute după intervalul ei, site-ul o trece singur la „livrate azi”. „Gata” o scoate imediat.
+
+Florarul poate pune oricând și comenzi luate la telefon sau în florărie, direct „În lucru”. Totul din `content.json` e public: în comenzi nu se scriu nume, telefoane sau adrese. Comenzile vechi se pot șterge oricând.
+
+Cu `?demo`, panoul și site-ul (`…/?demo`) arată comenzi inventate (din `"demo"` în `schema.json`).
 
 Adresa: **https://rocketknife1.github.io/floraria-bloom/admin/**
 
@@ -41,3 +56,12 @@ Panoul nu știe nimic anume despre Florăria Bloom. Pentru alt site:
 3. opțional, în schema: `"repo": "cont/repo"`, `"accent": "#culoare"`, `"maintenance": "cale/maintenance.json"`.
 
 Pentru „ascunde de pe site”, o listă primește în schemă câmpul `{"key": "hidden", "type": "bool", "label": "Ascuns de pe site"}`, iar site-ul sare peste elementele cu `"hidden": true`.
+
+Chei în plus, doar pentru panoul web (aplicația Organizator le ignoră, deci schema rămâne aceeași pentru amândouă):
+
+- la un câmp `select`: `"display": "chips"` arată butoane mari în loc de listă derulantă;
+- la un câmp `date`: `"quickDays": true` adaugă „Azi / Mâine / Poimâine”, iar un element nou pornește de la azi;
+- la un câmp `text`: `"placeholder"`;
+- la o listă: `"itemQuick": "cheie"` pune butoanele unui `select` direct pe rândul fiecărui element; `"itemDetails": ["cheie", …]` adaugă câmpuri pe rândul mic; `"newItemFirst": true` pune elementele noi sus; `"addLabel"` schimbă textul butonului de adăugat;
+- la o secțiune: `"open": true` o deschide de la început;
+- în rădăcina schemei: `"demo": {"fișier.json": {cheie: valoare}}` dă date de probă pentru `?demo`; zilele scrise `"@+0"`, `"@+1"` devin azi, mâine.
