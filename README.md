@@ -21,7 +21,7 @@ Site de prezentare pentru Florăria Bloom din Petroșani: buchete, cutii și co�
 
 ## Program, zone și prețuri de livrare
 
-Tot conținutul (program, zone și prețuri de livrare, galeria, poveștile, accesoriile, camera plantelor și textele secțiunilor) stă în `content.json`, în `config` pentru program și livrare. Se editează din aplicația Organizator (tab-ul „Site-uri”), care face commit pe acest fișier; formularele sunt descrise în `admin/schema.json`.
+Tot conținutul (program, zone și prețuri de livrare, galeria, poveștile, accesoriile, camera plantelor și textele secțiunilor) stă în `content.json`, în `config` pentru program și livrare. Se editează din **panoul de administrare** de pe web (`/admin/`, vezi [`admin/README.md`](admin/README.md)) sau din aplicația Organizator (tab-ul „Site-uri”); amândouă fac commit pe acest fișier, după formularele din `admin/schema.json`. Ce e marcat „ascuns” rămâne în fișier, dar nu apare pe site.
 Valorile de acum sunt **orientative** și apar pe site cu mențiunea „de confirmat” cât timp `draft: true`.
 
 Numărul de telefon este momentan ascuns parțial.

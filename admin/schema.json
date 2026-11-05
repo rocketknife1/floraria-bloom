@@ -2,6 +2,8 @@
   "version": 1,
   "name": "Florăria Bloom",
   "liveUrl": "https://rocketknife1.github.io/floraria-bloom/",
+  "repo": "rocketknife1/floraria-bloom",
+  "accent": "#6b4a8a",
   "imageDir": "img",
   "files": [
     {
@@ -66,6 +68,12 @@
               "key": "ask",
               "label": "Cum apare în mesajul de comandă (gol = numele)",
               "type": "text"
+            },
+            {
+              "key": "hidden",
+              "label": "Ascuns de pe site",
+              "type": "bool",
+              "description": "Rămâne aici, dar nu se vede pe site (de exemplu nu mai ai produsul). Îl arăți iar oricând."
             }
           ],
           "newItem": {
@@ -134,6 +142,12 @@
               "key": "bg",
               "label": "Culoarea de fundal",
               "type": "color"
+            },
+            {
+              "key": "hidden",
+              "label": "Ascuns de pe site",
+              "type": "bool",
+              "description": "Rămâne aici, dar nu se vede pe site (de exemplu nu mai ai produsul). Îl arăți iar oricând."
             }
           ],
           "newItem": {
@@ -290,6 +304,12 @@
               "key": "imagePosition",
               "label": "Încadrarea pozei (avansat, ex. 50% 88%)",
               "type": "text"
+            },
+            {
+              "key": "hidden",
+              "label": "Ascuns de pe site",
+              "type": "bool",
+              "description": "Rămâne aici, dar nu se vede pe site (de exemplu nu mai ai produsul). Îl arăți iar oricând."
             }
           ],
           "newItem": {
@@ -359,6 +379,12 @@
               "key": "light",
               "label": "Lumină",
               "type": "text"
+            },
+            {
+              "key": "hidden",
+              "label": "Ascuns de pe site",
+              "type": "bool",
+              "description": "Rămâne aici, dar nu se vede pe site (de exemplu nu mai ai produsul). Îl arăți iar oricând."
             }
           ],
           "newItem": {

@@ -16,7 +16,12 @@
     console.error("content.json nu s-a putut încărca", err);
     return;
   }
-  const { config: CONFIG, stories: STORIES, climate: CLIMATE } = CONTENT;
+  // Ce e marcat „ascuns” (din panoul de administrare sau din Organizator) nu
+  // apare pe site, dar rămâne în content.json, gata să fie arătat iar.
+  const shown = (list) => (list ?? []).filter((item) => !item.hidden);
+  const CONFIG = CONTENT.config;
+  const STORIES = shown(CONTENT.stories);
+  const CLIMATE = shown(CONTENT.climate);
 
 
   const TYPE_LABEL = { buchet: "Buchet", cutie: "Cutie cu flori", cos: "Coș cu flori" };
@@ -49,7 +54,7 @@
   const ASK_LABEL = { cutie: "Vreau una asemănătoare" };
   $$("[data-gallery]").forEach((ul) => {
     const type = ul.dataset.gallery;
-    ul.innerHTML = CONTENT.gallery
+    ul.innerHTML = shown(CONTENT.gallery)
       .filter((g) => g.type === type)
       .map(
         (g) => `<li data-type="${type}"><figure><button type="button" class="zoom" aria-label="Mărește: ${esc(g.name)}"><img src="${esc(g.img)}" alt="${esc(g.alt)}" loading="lazy"${dims(g)}></button><figcaption><span class="item-name">${esc(g.name)}</span><span class="item-desc">${esc(g.desc)}</span><a class="ask" data-item="${esc(g.ask || g.name)}" href="#comanda">${ASK_LABEL[type] ?? "Vreau unul asemănător"}</a></figcaption></figure></li>`,
@@ -59,7 +64,7 @@
   });
   $("[data-accessories]").insertAdjacentHTML(
     "afterbegin",
-    CONTENT.accessories
+    shown(CONTENT.accessories)
       .map((a) => {
         const cls = a.layout === "wide" ? ' class="b-wide"' : a.layout === "tall" ? ' class="b-tall"' : "";
         const style = a.imagePosition ? ` style="object-position: ${esc(a.imagePosition)}"` : "";
@@ -237,10 +242,11 @@
 
   /* Plant room climate tabs */
   const climate = $("[data-climate]");
-  if (climate) {
+  if (climate) climate.hidden = !CLIMATE.length;
+  if (climate && CLIMATE.length) {
     const tabs = $("[data-climate-tabs]");
     tabs.innerHTML = CLIMATE.map(
-      (c, i) => `<button type="button" role="tab" id="tab-${c.id}" aria-controls="climate-panel" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-climate-id="${c.id}">${c.tab}</button>`,
+      (c, i) => `<button type="button" role="tab" id="tab-${esc(c.id)}" aria-controls="climate-panel" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-climate-id="${esc(c.id)}">${esc(c.tab)}</button>`,
     ).join("");
     const panel = $("[data-climate-panel]");
     const band = $("[data-thermo-band]");

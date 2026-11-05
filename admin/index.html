@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#ffffff">
+  <title>Administrare</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <!-- Panoul de administrare al site-ului: vezi admin.js și README.md din acest folder. -->
+  <header class="topbar">
+    <div class="topbar-row">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div class="brand-text">
+          <strong id="site-name">Site</strong>
+          <small id="repo-name">Panou de administrare</small>
+        </div>
+      </div>
+      <a id="deploy" class="deploy" target="_blank" rel="noopener" hidden></a>
+      <a id="live-link" class="btn btn-small" target="_blank" rel="noopener" href="../">Vezi site-ul ↗</a>
+    </div>
+    <nav id="toolbar" class="toolbar" aria-label="Unelte" hidden>
+      <button type="button" id="history" class="tool">Istoric</button>
+      <button type="button" id="maintenance" class="tool">Mentenanță</button>
+      <button type="button" id="reload" class="tool">Reîncarcă</button>
+      <button type="button" id="help" class="tool">Ajutor</button>
+      <button type="button" id="logout" class="tool">Ieși</button>
+    </nav>
+  </header>
+
+  <p class="demo-banner">Demo: încearcă orice, dar nimic nu se salvează pe site.</p>
+
+  <main id="main" class="main">
+    <p class="loading">Se încarcă…</p>
+  </main>
+
+  <div id="savebar" class="savebar" hidden>
+    <span id="savebar-text" class="savebar-text"></span>
+    <button type="button" id="discard" class="btn btn-quiet">Renunță</button>
+    <button type="button" id="save" class="btn btn-primary">Salvează pe site</button>
+  </div>
+
+  <div id="busy" class="busy" hidden>
+    <div class="busy-box"><span class="spinner" aria-hidden="true"></span><span id="busy-text"></span></div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
