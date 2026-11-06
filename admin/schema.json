@@ -188,7 +188,8 @@
                   "value": "cos",
                   "label": "Coș cu flori"
                 }
-              ]
+              ],
+              "display": "chips"
             },
             {
               "key": "name",
@@ -288,7 +289,8 @@
                   "value": "cos",
                   "label": "Coș cu flori"
                 }
-              ]
+              ],
+              "display": "chips"
             },
             {
               "key": "bg",
@@ -450,7 +452,8 @@
                   "value": "tall",
                   "label": "Înaltă"
                 }
-              ]
+              ],
+              "display": "chips"
             },
             {
               "key": "imagePosition",
@@ -721,6 +724,16 @@
             {
               "key": "steps.3.text",
               "label": "Pasul 3 — text",
+              "type": "longtext"
+            },
+            {
+              "key": "live.title",
+              "label": "„Ce pregătim acum” — titlu",
+              "type": "text"
+            },
+            {
+              "key": "live.text",
+              "label": "„Ce pregătim acum” — text",
               "type": "longtext"
             },
             {

@@ -935,3 +935,9 @@ textarea.pick-text { resize: vertical; margin-top: 10px; }
   user-select: none;
   pointer-events: none;
 }
+
+/* În editare (?edit) proprietarul vede toate comenzile, cu starea fiecăreia */
+.live-item[data-state="cerere"] em { color: #7a5300; background: #fff1cf; }
+.live-item[data-state="gata"] em { color: #1e7f4f; background: #e3f5ea; }
+.live-item[data-state="cerere"] em::before, .live-item[data-state="gata"] em::before { animation: none; background: currentColor; }
+.live-list .live-empty { padding: 18px; border-radius: 14px; background: #fff; color: var(--ink-soft); text-align: center; }

@@ -8,17 +8,44 @@
    *  - stories, gallery, accessories, climate: listele de pe pagină.
    *  - texts: titlurile și paragrafele marcate cu data-text în index.html.
    * ------------------------------------------------------------------ */
+  // Cu ?edit în adresă proprietarul își editează site-ul direct pe pagină
+  // (admin/edit.js): conținutul vine atunci de la editor, cu ce n-a salvat încă.
+  const EDIT = new URLSearchParams(location.search).has("edit");
+  let EDITOR = null;
   let CONTENT;
-  try {
-    const res = await fetch("content.json", { cache: "no-store" });
-    CONTENT = await res.json();
-  } catch (err) {
-    console.error("content.json nu s-a putut încărca", err);
-    return;
+  if (EDIT) {
+    try {
+      EDITOR = await import(new URL("admin/edit.js?v=3", document.baseURI).href);
+      CONTENT = await EDITOR.start();
+    } catch (err) {
+      console.error("Editarea nu a pornit", err);
+    }
   }
-  // Ce e marcat „ascuns” (din panoul de administrare sau din Organizator) nu
-  // apare pe site, dar rămâne în content.json, gata să fie arătat iar.
-  const shown = (list) => (list ?? []).filter((item) => !item.hidden);
+  if (!CONTENT) {
+    try {
+      const res = await fetch("content.json", { cache: "no-store" });
+      CONTENT = await res.json();
+    } catch (err) {
+      console.error("content.json nu s-a putut încărca", err);
+      return;
+    }
+  }
+  // Ce e marcat „ascuns” nu apare pe site, dar rămâne în content.json, gata să
+  // fie arătat iar. În editare se vede estompat, ca să-l poți arăta din nou.
+  const shown = (list) => (list ?? []).filter((item) => EDIT || !item.hidden);
+  // În editare: unde stă fiecare bucată în content.json, pentru lupa de lângă ea.
+  const ed = (path) => (EDIT ? ` data-edit="${path}"` : "");
+  const live = (path) => (EDIT ? ` data-edit-live="${path}"` : "");
+  const hid = (item) => (EDIT && item?.hidden ? " is-hidden-edit" : "");
+  const addHere = (node, list, label, preset) => {
+    if (!EDIT || !node) return;
+    node.dataset.editAdd = list;
+    node.dataset.editAddLabel = label;
+    if (preset) node.dataset.editPreset = JSON.stringify(preset);
+  };
+  const markEdit = (node, path) => {
+    if (EDIT && node) node.dataset.edit = path;
+  };
   const CONFIG = CONTENT.config;
   const STORIES = shown(CONTENT.stories);
   const CLIMATE = shown(CONTENT.climate);
@@ -48,30 +75,37 @@
     const t = CONTENT.texts?.[el.dataset.text];
     if (t != null) el.textContent = t;
   });
-  $("[data-story-rings]").innerHTML = STORIES.map(
-    (s, i) => `<li><button type="button" class="story-ring" data-story="${i}"><img src="${esc(s.src)}" alt=""${dims(s)} loading="lazy"><span>${esc(s.label)}</span></button></li>`,
-  ).join("");
+  $("[data-story-rings]").innerHTML = STORIES.map((s, i) => {
+    const at = `stories/${CONTENT.stories.indexOf(s)}`;
+    return `<li class="${hid(s)}"${ed(at)}><button type="button" class="story-ring" data-story="${i}"><img${live(`${at}/src`)} src="${esc(s.src)}" alt=""${dims(s)} loading="lazy"><span${live(`${at}/label`)}>${esc(s.label)}</span></button></li>`;
+  }).join("");
+  addHere($("[data-story-rings]"), "stories", "Poveste");
   const ASK_LABEL = { cutie: "Vreau una asemănătoare" };
   $$("[data-gallery]").forEach((ul) => {
     const type = ul.dataset.gallery;
     ul.innerHTML = shown(CONTENT.gallery)
       .filter((g) => g.type === type)
-      .map(
-        (g) => `<li data-type="${type}"><figure><button type="button" class="zoom" aria-label="Mărește: ${esc(g.name)}"><img src="${esc(g.img)}" alt="${esc(g.alt)}" loading="lazy"${dims(g)}></button><figcaption><span class="item-name">${esc(g.name)}</span><span class="item-desc">${esc(g.desc)}</span><a class="ask" data-item="${esc(g.ask || g.name)}" href="#comanda">${ASK_LABEL[type] ?? "Vreau unul asemănător"}</a></figcaption></figure></li>`,
-      )
+      .map((g) => {
+        const at = `gallery/${CONTENT.gallery.indexOf(g)}`;
+        return `<li data-type="${type}" class="${hid(g)}"${ed(at)}><figure><button type="button" class="zoom" aria-label="Mărește: ${esc(g.name)}"><img${live(`${at}/img`)} src="${esc(g.img)}" alt="${esc(g.alt)}" loading="lazy"${dims(g)}></button><figcaption><span class="item-name"${live(`${at}/name`)}>${esc(g.name)}</span><span class="item-desc"${live(`${at}/desc`)}>${esc(g.desc)}</span><a class="ask" data-item="${esc(g.ask || g.name)}" href="#comanda">${ASK_LABEL[type] ?? "Vreau unul asemănător"}</a></figcaption></figure></li>`;
+      })
       .join("");
-    ul.closest("[data-rail]").hidden = !ul.children.length;
+    // în editare rândul rămâne și gol, ca să ai unde adăuga
+    ul.closest("[data-rail]").hidden = !EDIT && !ul.children.length;
+    addHere(ul, "gallery", "Adaugă", { type });
   });
   $("[data-accessories]").insertAdjacentHTML(
     "afterbegin",
     shown(CONTENT.accessories)
       .map((a) => {
-        const cls = a.layout === "wide" ? ' class="b-wide"' : a.layout === "tall" ? ' class="b-tall"' : "";
+        const at = `accessories/${CONTENT.accessories.indexOf(a)}`;
+        const cls = `${a.layout === "wide" ? "b-wide" : a.layout === "tall" ? "b-tall" : ""}${hid(a)}`.trim();
         const style = a.imagePosition ? ` style="object-position: ${esc(a.imagePosition)}"` : "";
-        return `<li${cls}><img${style} src="${esc(a.img)}" alt="${esc(a.alt)}" loading="lazy"${dims(a)}><div class="b-text"><h3>${esc(a.title)}</h3><p>${esc(a.text)}</p></div></li>`;
+        return `<li${cls ? ` class="${cls}"` : ""}${ed(at)}><img${style}${live(`${at}/img`)} src="${esc(a.img)}" alt="${esc(a.alt)}" loading="lazy"${dims(a)}><div class="b-text"><h3${live(`${at}/title`)}>${esc(a.title)}</h3><p${live(`${at}/text`)}>${esc(a.text)}</p></div></li>`;
       })
       .join(""),
   );
+  addHere($("[data-accessories]"), "accessories", "Accesoriu");
 
   /* Header + menu */
   const header = $(".site-header");
@@ -110,6 +144,7 @@
   function renderStatus() {
     const s = shopStatus();
     $$("[data-status]").forEach((el) => {
+      markEdit(el, "config/hours");
       el.hidden = false;
       el.classList.toggle("is-open", s.open);
       el.innerHTML = `<span class="dot" aria-hidden="true"></span>${s.text}${draftTag()}`;
@@ -118,6 +153,7 @@
 
   /* Opening hours table */
   const hoursTable = $("[data-hours]");
+  markEdit(hoursTable, "config/hours");
   if (hoursTable) {
     const order = [1, 2, 3, 4, 5, 6, 0];
     const todayIdx = new Date().getDay();
@@ -133,6 +169,7 @@
 
   /* Google map with the shop address */
   const mapCard = $("[data-map]");
+  markEdit(mapCard, "config/mapsQuery");
   if (mapCard && CONFIG.mapsQuery) {
     const q = encodeURIComponent(CONFIG.mapsQuery);
     mapCard.innerHTML = `<iframe title="Harta: Florăria Bloom Petroșani" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=${q}&output=embed"></iframe>
@@ -143,13 +180,15 @@
   const zones = CONFIG.delivery.zones;
   $("[data-zones]").innerHTML = zones
     .map(
-      (z, i) => `<li data-zone="${i}">
-        <span class="zone-name">${z.name}</span>
+      (z, i) => `<li data-zone="${i}"${ed(`config/delivery/zones/${i}`)}>
+        <span class="zone-name"${live(`config/delivery/zones/${i}/name`)}>${esc(z.name)}</span>
         <span class="zone-price">${lei(z.price)}</span>
         <span class="zone-time">${z.km ? `${km(z.km)} · ~${z.min} min · ` : ""}${z.time}</span>
       </li>`,
     )
     .join("");
+  markEdit($("[data-zones-note]"), "config/delivery");
+  markEdit($("[data-countdown]"), "config/delivery");
   $("[data-zones-note]").innerHTML =
     `Livrare gratuită în Petroșani pentru comenzile de peste ${CONFIG.delivery.freeOverLei} lei. Livrăm de ${DAYS[CONFIG.delivery.days[0]]} până ${DAYS[CONFIG.delivery.days.at(-1)]}. Distanțele sunt pe drum, din fața florăriei.` +
     draftTag();
@@ -245,13 +284,23 @@
   if (climate) climate.hidden = !CLIMATE.length;
   if (climate && CLIMATE.length) {
     const tabs = $("[data-climate-tabs]");
-    tabs.innerHTML = CLIMATE.map(
-      (c, i) => `<button type="button" role="tab" id="tab-${esc(c.id)}" aria-controls="climate-panel" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-climate-id="${esc(c.id)}">${esc(c.tab)}</button>`,
-    ).join("");
+    tabs.innerHTML = CLIMATE.map((c, i) => {
+      const at = `climate/${CONTENT.climate.indexOf(c)}`;
+      return `<button type="button" role="tab" id="tab-${esc(c.id)}" aria-controls="climate-panel" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-climate-id="${esc(c.id)}"${EDIT && c.hidden ? ' class="is-hidden-edit"' : ""}${ed(at)}${live(`${at}/tab`)}>${esc(c.tab)}</button>`;
+    }).join("");
+    addHere(tabs, "climate", "Tip de plantă");
     const panel = $("[data-climate-panel]");
     const band = $("[data-thermo-band]");
     const selectClimate = (id, focus = false) => {
       const c = CLIMATE.find((x) => x.id === id);
+      if (EDIT) {
+        // lupa de pe panou deschide tipul de plantă arătat acum
+        const at = `climate/${CONTENT.climate.indexOf(c)}`;
+        panel.dataset.edit = at;
+        $("[data-climate-title]").dataset.editLive = `${at}/title`;
+        $("[data-climate-text]").dataset.editLive = `${at}/text`;
+        $("[data-climate-img]").dataset.editLive = `${at}/img`;
+      }
       $$("[role=tab]", tabs).forEach((t) => {
         const on = t.dataset.climateId === id;
         t.setAttribute("aria-selected", String(on));
@@ -388,7 +437,8 @@
   const liveSection = $("[data-live-orders]");
   if (liveSection) {
     let orders = CONTENT.comenzi ?? [];
-    if (new URLSearchParams(location.search).has("demo")) {
+    // în editare, demo-ul își pune comenzile de probă chiar în conținut
+    if (!EDIT && new URLSearchParams(location.search).has("demo")) {
       try {
         const schema = await (await fetch("admin/schema.json", { cache: "no-store" })).json();
         orders = withDates(schema.demo?.["content.json"]?.comenzi ?? []);
@@ -412,7 +462,7 @@
     const working = orders.filter((o) => o.stare === "lucru" && now < endOf(o)).sort((a, b) => endOf(a) - endOf(b));
     const isToday = (o) => new Date(`${o.zi}T12:00:00`).toDateString() === now.toDateString();
     const doneToday = orders.filter((o) => isToday(o) && (o.stare === "gata" || (o.stare === "lucru" && now >= endOf(o)))).length;
-    liveSection.hidden = !working.length && !doneToday;
+    liveSection.hidden = !EDIT && !working.length && !doneToday;
     if (liveSection.hidden) return;
     const dayWord = (o) => {
       const d = new Date(`${o.zi}T12:00:00`);
@@ -423,14 +473,24 @@
       working.length ? `<span><b>${working.length}</b> ${working.length === 1 ? "comandă" : "comenzi"} în lucru</span>` : "",
       doneToday ? `<span><b>${doneToday}</b> ${doneToday === 1 ? "livrată" : "livrate"} azi</span>` : "",
     ].join("");
-    $("[data-live-list]").innerHTML = working
-      .map((o) => {
-        const [label, img] = KIND[o.tip] ?? KIND.buchet;
-        const part = (SLOT[o.interval] ?? SLOT.oricand)[0];
-        const where = !o.unde || o.unde === "ridicare" ? "se ridică din florărie" : `livrare în ${o.unde}`;
-        return `<li class="live-item"><img src="${img}" alt="" loading="lazy"><div><b>${esc(label)}</b>${o.ce ? ` · ${esc(o.ce)}` : ""}<span>Pentru ${esc(dayWord(o))}${part ? `, ${part}` : ""} · ${esc(where)}</span></div><em>în lucru</em></li>`;
-      })
-      .join("");
+    // În editare proprietarul vede toate comenzile (și cererile, și cele gata),
+    // fiecare cu lupa ei; vizitatorii văd doar ce e în lucru acum.
+    const shownOrders = EDIT ? (all ?? []).filter((o) => o && typeof o === "object") : working;
+    const STATE = { cerere: "cerere nouă", lucru: "în lucru", gata: "gata" };
+    $("[data-live-list]").innerHTML =
+      shownOrders
+        .map((o) => {
+          const [label, img] = KIND[o.tip] ?? KIND.buchet;
+          const part = (SLOT[o.interval] ?? SLOT.oricand)[0];
+          const where = !o.unde || o.unde === "ridicare" ? "se ridică din florărie" : `livrare în ${o.unde}`;
+          const when = /^\d{4}-\d{2}-\d{2}$/.test(o.zi ?? "") ? `Pentru ${dayWord(o)}${part ? `, ${part}` : ""} · ` : "";
+          const late = o.stare === "lucru" && /^\d{4}-\d{2}-\d{2}$/.test(o.zi ?? "") && now >= endOf(o);
+          const badge = EDIT ? (late ? "livrată" : STATE[o.stare] ?? "în lucru") : "în lucru";
+          const at = EDIT ? ` data-state="${late ? "gata" : esc(o.stare)}"${ed(`comenzi/${all.indexOf(o)}`)}` : "";
+          return `<li class="live-item${hid(o)}"${at}><img src="${img}" alt="" loading="lazy"><div><b>${esc(label)}</b>${o.ce ? ` · ${esc(o.ce)}` : ""}<span>${esc(when)}${esc(where)}</span></div><em>${esc(badge)}</em></li>`;
+        })
+        .join("") || (EDIT ? '<li class="live-empty">Nicio comandă încă. Apasă „+ Comandă nouă”.</li>' : "");
+    addHere($("[data-live-list]"), "comenzi", "Comandă nouă");
   }
 
   /** Datele de probă scriu ziua ca „@+1” (mâine): aici devine o dată adevărată. */
@@ -631,6 +691,9 @@
     );
     io.observe(mapRoot);
   }
+
+  // pagina e desenată: editorul pune lupele peste ea
+  EDITOR?.rendered();
 
   /* Scroll motion ------------------------------------------------------ */
   if (reduceMotion) {

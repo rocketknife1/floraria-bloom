@@ -15,6 +15,8 @@
     return;
   }
   if (!m || m.active !== true) return;
+  // cine editează site-ul (?edit) trebuie să-l vadă; bara editorului spune că e în mentenanță
+  if (new URLSearchParams(location.search).has("edit")) return;
 
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   const style = document.createElement("style");

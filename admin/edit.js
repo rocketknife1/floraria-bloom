@@ -1,23 +1,26 @@
 /*
- * Panoul de administrare al site-ului (admin/index.html).
+ * Editarea site-ului direct pe pagină: deschizi site-ul cu „?edit” în adresă.
  *
- * Citește admin/schema.json (aceeași schemă pe care o folosește aplicația
- * Organizator) și arată un formular pentru tot conținutul site-ului: liste cu
- * adăugare, ascundere, ștergere și reordonare, poze, program, prețuri, texte.
- * „Salvează pe site” face un commit în repo-ul de pe GitHub, iar GitHub Pages
- * publică singur site-ul în aproximativ un minut.
+ * Proprietarul își vede site-ul real; lângă tot ce se poate schimba apare un
+ * contur și o lupă. Atinge lupa, schimbă textul, poza, prețul sau programul
+ * și vede pe loc cum arată. Butoanele mari, pozele micșorate automat și
+ * salvarea sunt aceleași pentru orice site cu admin/schema.json.
  *
- * Nu are server: vorbește direct cu GitHub, cu cheia de acces a celui care
- * administrează site-ul, ținută doar în browserul lui. Nu știe nimic anume
- * despre un site, deci se copiază la fel în orice site cu admin/schema.json.
+ * Ce se poate edita și cum se cheamă câmpurile vine din admin/schema.json.
+ * Pagina își marchează bucățile cu data-edit="secțiune/…" și textele cu
+ * data-text, apoi cheamă start() înainte să deseneze și rendered() după.
  *
- * Cu „?demo” la sfârșitul adresei merge fără cheie: citește fișierele de pe
- * site, iar „salvările” rămân doar în pagină (pentru încercat sau arătat).
+ * „Salvează” face un commit în repo-ul de pe GitHub, iar GitHub Pages publică
+ * singur în aproximativ un minut. Fără server: editorul vorbește direct cu
+ * GitHub, cu cheia celui care administrează (în aplicația Organizator vine
+ * singură). Cu „?edit&demo” merge fără cheie și nu salvează nimic.
  */
 
 const API = "https://api.github.com";
 const DEMO = new URLSearchParams(location.search).has("demo");
-const SITE_ROOT = new URL("../", location.href);
+const SITE_ROOT = new URL("./", location.href);
+/** Deschis din aplicația Organizator (WebView-ul ei are puntea asta). */
+const IN_APP = "OrganizatorBridge" in window;
 const DAYS = ["Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă", "Duminică"];
 const DAYS_SHORT = ["L", "Ma", "Mi", "J", "V", "S", "D"];
 
@@ -25,7 +28,9 @@ const DAYS_SHORT = ["L", "Ma", "Mi", "J", "V", "S", "D"];
 /* Mici ajutoare                                                       */
 /* ------------------------------------------------------------------ */
 
-const $ = (sel, root = document) => root.querySelector(sel);
+/** Rădăcina editorului (Shadow DOM), ca stilurile lui să nu atingă site-ul. */
+let UI = null;
+const $ = (sel, root = UI) => root?.querySelector(sel) ?? null;
 
 /** Creează un element; textul intră mereu ca text, niciodată ca HTML. */
 function el(tag, props = {}, ...children) {
@@ -252,6 +257,14 @@ class Demo {
       if (version?.files.has(path)) return { sha: ref, bytes: version.files.get(path) };
     }
     if (!this.files.has(path)) {
+      let kept = null;
+      try {
+        kept = sessionStorage.getItem(`site-edit:demo:${path}`);
+      } catch {}
+      if (kept) {
+        this.files.set(path, base64ToBytes(kept));
+        return { sha: "demo-kept", bytes: this.files.get(path) };
+      }
       const res = await fetch(new URL(path, SITE_ROOT), { cache: "no-store" });
       if (!res.ok) throw new AdminError(`Nu găsesc „${path}” pe site.`, "missing");
       this.files.set(path, withDemoData(path, new Uint8Array(await res.arrayBuffer())));
@@ -262,7 +275,13 @@ class Demo {
 
   async commit(files, message) {
     await new Promise((r) => setTimeout(r, 600));
-    for (const [path, b64] of Object.entries(files)) this.files.set(path, base64ToBytes(b64));
+    for (const [path, b64] of Object.entries(files)) {
+      this.files.set(path, base64ToBytes(b64));
+      // în demo, „salvările” rămân în sesiune, ca pagina să se poată redesena
+      try {
+        if (path.endsWith(".json")) sessionStorage.setItem(`site-edit:demo:${path}`, b64);
+      } catch {}
+    }
     const sha = `demo-${Date.now().toString(36)}`;
     this.log.unshift({ sha, message, date: new Date(), files: new Map(this.files) });
     return sha;
@@ -292,7 +311,7 @@ const state = {
   files: [], // { def, path, sha, original, working }
   pending: new Map(), // calea pozei în repo → { bytes, url }
   previews: new Map(), // valoarea din JSON → link local, pentru pozele urcate acum
-  maintenance: null, // { path, sha, data }
+  maintenanceOn: false,
   deploy: { state: "idle" },
 };
 
@@ -402,22 +421,22 @@ function changedSections() {
 }
 
 let refreshQueued = false;
-/** După orice schimbare: bara „Salvează”, semnele „modificat” de pe secțiuni. */
+/** După orice schimbare: bara de jos arată ce n-ai salvat, cu „Salvează” și „Renunță”. */
 function changed() {
   if (refreshQueued) return;
   refreshQueued = true;
   requestAnimationFrame(() => {
     refreshQueued = false;
-    const names = changedSections();
-    const bar = $("#savebar");
-    bar.hidden = !names.length;
-    $("#savebar-text").textContent = names.length === 1 ? "1 secțiune modificată" : `${names.length} secțiuni modificate`;
-    for (const f of state.files) {
-      for (const s of f.def.sections) {
-        const badge = document.querySelector(`[data-badge="${CSS.escape(f.path + "|" + s.key)}"]`);
-        if (badge) badge.hidden = !sectionChanged(f, s.key);
-      }
-    }
+    const names = changedSections().map(shortLabel);
+    const dirty = names.length > 0 || state.pending.size > 0;
+    $("#save").hidden = !dirty;
+    $("#discard").hidden = !dirty;
+    $("#bar").classList.toggle("dirty", dirty);
+    $("#bar-sub").textContent = dirty
+      ? `Nesalvat: ${names.join(", ") || "poze noi"}`
+      : state.maintenanceOn
+        ? "Site-ul e în mentenanță: vizitatorii văd doar mesajul."
+        : "Atinge lupa de lângă ce vrei să schimbi.";
   });
 }
 
@@ -463,8 +482,9 @@ async function save() {
     );
     return;
   }
-  const names = changedSections();
-  const ok = await ask("Salvez pe site?", `Se publică: ${names.join(", ")}. Apare pe site în aproximativ un minut.`, "Salvează");
+  const names = changedSections().map(shortLabel);
+  const what = names.join(", ") || "poze noi";
+  const ok = await ask("Pui pe site?", `Se schimbă: ${what}. Vizitatorii văd noua variantă în aproximativ un minut.`, "Salvează");
   if (!ok) return;
   await busy("Se salvează pe site…", async () => {
     const changedFiles = state.files.filter(fileChanged);
@@ -476,23 +496,25 @@ async function save() {
       if (allJson.includes(path.split("/").pop())) files[path] = bytesToBase64(img.bytes);
     }
     const expected = Object.fromEntries(changedFiles.map((f) => [f.path, f.sha]));
-    const sha = await state.backend.commit(files, `Modificat din panoul de administrare: ${names.join(", ")}`, expected);
+    const sha = await state.backend.commit(files, `Modificat pe site: ${what}`, expected);
     for (const f of changedFiles) {
       f.sha = (await state.backend.getFile(f.path, sha)).sha;
       f.original = structuredClone(f.working);
     }
-    state.pending.clear();
+    state.pending.clear(); // previzualizările rămân până se publică pozele
+    clearDraft();
     changed();
     watchDeploy(sha);
-    toast(DEMO ? "Salvat în demo (pe site nu se schimbă nimic)." : "Salvat! Apare pe site în aproximativ un minut.");
+    toast(DEMO ? "Salvat în demo (pe site nu se schimbă nimic)." : "Salvat! Vizitatorii văd schimbarea în aproximativ un minut.");
   });
 }
 
 async function discard() {
-  if (!(await ask("Renunți la modificări?", "Tot ce ai schimbat de la ultima salvare se pierde.", "Renunță", true))) return;
+  if (!(await ask("Renunți la modificări?", "Tot ce ai schimbat de la ultima salvare se pierde, iar pagina revine cum e pe site.", "Renunță", true))) return;
   for (const f of state.files) f.working = structuredClone(f.original);
   state.pending.clear();
-  renderEditor();
+  clearDraft();
+  reloadPage();
 }
 
 /* ------------------------------------------------------------------ */
@@ -592,15 +614,21 @@ async function addImage(file) {
   const fileName = `${base.slice(0, 40)}-${Date.now().toString(36)}.${img.ext}`;
   const value = publicPathFor(fileName);
   const url = URL.createObjectURL(new Blob([img.bytes], { type: img.ext === "png" ? "image/png" : "image/jpeg" }));
-  state.pending.set(`${imageDir()}/${fileName}`, { bytes: img.bytes, url });
+  const type = img.ext === "png" ? "image/png" : "image/jpeg";
+  state.pending.set(`${imageDir()}/${fileName}`, { bytes: img.bytes, url, value, type });
   state.previews.set(value, url);
   return { value, width: img.width, height: img.height };
 }
 
 function pickFiles({ multiple = false } = {}) {
   return new Promise((resolve) => {
-    const input = el("input", { type: "file", accept: "image/*", multiple });
-    input.addEventListener("change", () => resolve([...input.files]));
+    // în pagină, nu doar în memorie: așa merge și în WebView-ul aplicației
+    const input = el("input", { type: "file", accept: "image/*", multiple, hidden: true });
+    input.addEventListener("change", () => {
+      resolve([...input.files]);
+      input.remove();
+    });
+    UI.append(input);
     input.click();
   });
 }
@@ -1154,136 +1182,8 @@ function listField(def, obj, update) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Ecranele                                                            */
+/* Istoric și mentenanță                                               */
 /* ------------------------------------------------------------------ */
-
-function renderEditor() {
-  const main = $("#main");
-  const nav = el("nav", { class: "section-nav", "aria-label": "Secțiuni" });
-  const sections = el("div", { class: "sections" });
-  for (const f of state.files) {
-    for (const s of f.def.sections) {
-      const id = `s-${slugify(f.path)}-${slugify(s.key)}`;
-      nav.append(el("a", { href: `#${id}`, class: "nav-chip", text: s.label.replace(/\s*\(.*\)$/, "") }));
-      // titlul și descrierea secțiunii sunt deja sus, în bara ei
-      const body = s.type === "list" || s.type === "group" ? field({ ...s, label: s.type === "group" ? "" : s.label, description: null }, f.working, changed) : fieldsForm([s], f.working, null);
-      sections.append(
-        el(
-          "details",
-          { class: "section", id, open: s.open === true || (state.files.length === 1 && f.def.sections.length <= 2) },
-          el("summary", {}, el("span", { class: "section-title", text: s.label }), el("span", { class: "tag tag-changed", "data-badge": `${f.path}|${s.key}`, text: "modificat", hidden: true }), el("span", { class: "chevron", "aria-hidden": "true" })),
-          s.description ? el("p", { class: "section-help", text: s.description }) : null,
-          el("div", { class: "section-body" }, body),
-        ),
-      );
-    }
-  }
-  nav.addEventListener("click", (e) => {
-    const a = e.target.closest("a");
-    if (!a) return;
-    e.preventDefault();
-    const target = document.getElementById(a.getAttribute("href").slice(1));
-    target.open = true;
-    target.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
-  main.replaceChildren(nav, sections);
-  changed();
-}
-
-function renderLogin(error) {
-  const schema = state.schema;
-  const repo = state.repo;
-  const repoText = repo ? `${repo.owner}/${repo.name}` : "";
-  const name = encodeURIComponent(`Panou ${schema.name}`.slice(0, 40));
-  const fineGrained = `https://github.com/settings/personal-access-tokens/new?name=${name}&description=${encodeURIComponent("Cheia panoului de administrare al site-ului")}${repo ? `&target_name=${encodeURIComponent(repo.owner)}` : ""}&expires_in=none&contents=write`;
-  const classic = `https://github.com/settings/tokens/new?scopes=public_repo&description=${name}`;
-  const tokenInput = el("input", { type: "password", autocomplete: "off", placeholder: "github_pat_… sau ghp_…", "aria-label": "Cheia de acces" });
-  const repoInput = el("input", { type: "text", value: repoText, placeholder: "cont/nume-repo" });
-  const remember = el("input", { type: "checkbox", class: "switch", checked: true });
-  const form = el(
-    "form",
-    {
-      class: "login card",
-      onsubmit: async (e) => {
-        e.preventDefault();
-        const token = tokenInput.value.trim();
-        const [owner, repoName] = repoInput.value.trim().split("/");
-        if (!owner || !repoName) return renderLogin("Scrie repo-ul ca „cont/nume-repo”.");
-        if (!token) return renderLogin("Lipește cheia de acces.");
-        state.repo = { owner, name: repoName };
-        if (`${owner}/${repoName}` !== repoText) {
-          try {
-            localStorage.setItem(repoKey(), `${owner}/${repoName}`);
-          } catch {}
-        }
-        try {
-          await connect(token);
-          storeToken(token, remember.checked);
-        } catch (err) {
-          renderLogin(err.message);
-        }
-      },
-    },
-    el("h1", { text: schema.name }),
-    el("p", { class: "lead", text: "Panoul de administrare al site-ului: produse, poze, program, prețuri și texte, fără să atingi codul." }),
-    error ? el("p", { class: "error", role: "alert", text: error }) : null,
-    el(
-      "ol",
-      { class: "steps" },
-      el("li", {}, el("b", { text: "Creează o cheie de acces" }), " în contul GitHub în care e site-ul (o singură dată pe telefonul sau calculatorul ăsta). ", el("a", { href: fineGrained, target: "_blank", rel: "noopener", class: "btn btn-small" }, "Creează cheia ↗")),
-      el("li", {}, "Pe pagina GitHub: la ", el("b", { text: "Repository access" }), " alege ", el("i", { text: "Only select repositories" }), ` și bifează ${repo?.name ?? "repo-ul site-ului"}; la `, el("b", { text: "Permissions → Contents" }), " alege ", el("i", { text: "Read and write" }), ". Apoi ", el("b", { text: "Generate token" }), "."),
-      el("li", {}, "Copiază cheia (începe cu ", el("code", { text: "github_pat_" }), ") și lipește-o mai jos."),
-    ),
-    el("label", { class: "field" }, el("span", { class: "field-label", text: "Cheia de acces" }), tokenInput),
-    el("label", { class: "field field-switch" }, el("span", { class: "field-label", text: "Ține-mă minte pe acest dispozitiv" }), remember),
-    el(
-      "details",
-      { class: "advanced" },
-      el("summary", { text: "Altă situație" }),
-      el("label", { class: "field" }, el("span", { class: "field-label", text: "Repo-ul site-ului" }), el("span", { class: "field-help", text: "Se completează singur; schimbă doar dacă site-ul e în alt cont." }), repoInput),
-      el("p", { class: "field-help" }, "Ești doar colaborator la repo (nu e în contul tău)? Atunci folosește o ", el("a", { href: classic, target: "_blank", rel: "noopener", text: "cheie clasică cu „public_repo”" }), "."),
-    ),
-    el("button", { type: "submit", class: "btn btn-primary btn-wide" }, "Intră"),
-    el("p", { class: "fine" }, "Cheia rămâne doar în browserul tău și merge doar la GitHub. ", el("a", { href: "?demo", text: "Vreau doar să încerc (demo)" })),
-  );
-  $("#main").replaceChildren(form);
-  $("#toolbar").hidden = true;
-  tokenInput.focus();
-}
-
-/** Verifică cheia, citește conținutul și deschide editorul. */
-async function connect(token) {
-  const backend = DEMO ? new Demo() : new GitHub(token, { ...state.repo, branch: "main" });
-  await busy("Mă conectez la site…", async () => {
-    const info = await backend.info();
-    if (!info.permissions?.push) throw new AdminError("Cheia merge, dar nu are voie să schimbe site-ul. Alege „Contents: Read and write” când creezi cheia.", "auth");
-    if (!DEMO) backend.repo.branch = info.default_branch ?? "main";
-    state.backend = backend;
-    state.repo = backend.repo;
-    await loadContent();
-  });
-  $("#toolbar").hidden = false;
-  $("#repo-name").textContent = DEMO ? "demo — nimic nu se salvează pe site" : `${state.repo.owner}/${state.repo.name}`;
-  renderEditor();
-  checkLastDeploy();
-}
-
-async function loadContent() {
-  const files = [];
-  for (const def of state.schema.files) {
-    const file = await state.backend.getFile(def.path);
-    const json = JSON.parse(fromUtf8.decode(file.bytes));
-    files.push({ def, path: def.path, sha: file.sha, original: json, working: structuredClone(json) });
-  }
-  state.files = files;
-  state.pending.clear();
-}
-
-async function reload() {
-  if (isDirty() && !(await ask("Reîncarci?", "Ce n-ai salvat se pierde și vezi site-ul cum e acum pe GitHub.", "Reîncarcă", true))) return;
-  await busy("Reîncarc…", loadContent);
-  renderEditor();
-}
 
 /* ---- Istoric ---- */
 
@@ -1313,15 +1213,13 @@ async function showHistory() {
                     try {
                       await busy("Readuc versiunea…", async () => {
                         const old = await state.backend.getFile(f.path, v.sha);
-                        const sha = await state.backend.commit({ [f.path]: bytesToBase64(old.bytes) }, `Revenit din panoul de administrare la versiunea din ${formatDate(v.date)}`, { [f.path]: f.sha });
-                        watchDeploy(sha);
-                        await loadContent();
+                        await state.backend.commit({ [f.path]: bytesToBase64(old.bytes) }, `Revenit pe site la versiunea din ${formatDate(v.date)}`, { [f.path]: f.sha });
                       });
                     } catch {
                       return; // busy() a arătat deja ce nu a mers
                     }
-                    renderEditor();
-                    toast("Gata, versiunea veche e din nou pe site (în aproximativ un minut).");
+                    clearDraft();
+                    reloadPage();
                   },
                 }, "Readu"),
           ),
@@ -1366,8 +1264,10 @@ async function showMaintenance() {
         dialog.close();
         try {
           await busy("Se salvează…", async () => {
-            const sha = await state.backend.commit({ [path]: bytesToBase64(utf8.encode(encodeJson(data))) }, data.active ? "Mentenanță pornită din panoul de administrare" : "Mentenanță oprită din panoul de administrare", { [path]: current.sha });
+            const sha = await state.backend.commit({ [path]: bytesToBase64(utf8.encode(encodeJson(data))) }, data.active ? "Mentenanță pornită de pe site" : "Mentenanță oprită de pe site", { [path]: current.sha });
             watchDeploy(sha);
+            state.maintenanceOn = data.active === true;
+            changed();
           });
         } catch {
           return; // busy() a arătat deja ce nu a mers
@@ -1375,30 +1275,6 @@ async function showMaintenance() {
         toast(data.active ? "Mentenanța pornește pe site în aproximativ un minut." : "Site-ul revine în aproximativ un minut.");
       },
     }, "Salvează")),
-  );
-}
-
-/* ---- Ajutor ---- */
-
-function showHelp() {
-  openDialog(
-    "Cum se folosește",
-    el(
-      "div",
-      { class: "help" },
-      el("h3", { text: "Adaugi un produs nou" }),
-      el("p", { text: "Deschide lista (ex. Galerie), apasă „+ Adaugă”, completează numele, alege poza din telefon și apasă „Salvează pe site”." }),
-      el("h3", { text: "Nu mai ai un produs" }),
-      el("p", { text: "Atinge-l în listă și apasă „Ascunde de pe site”. Rămâne aici și îl arăți iar când îl ai. „Șterge” îl scoate de tot." }),
-      el("h3", { text: "Schimbi ordinea" }),
-      el("p", { text: "Atinge produsul și folosește „↑ Sus” / „↓ Jos”. Pe site apare în aceeași ordine." }),
-      el("h3", { text: "Program, telefon, livrare, texte" }),
-      el("p", { text: "Sunt în secțiunile lor; schimbi ce vrei și salvezi. Pozele le micșorez eu automat, ca site-ul să rămână rapid." }),
-      el("h3", { text: "Când apare pe site?" }),
-      el("p", { text: "La aproximativ un minut după „Salvează pe site”. Sus vezi „Se publică…”, apoi „Pe site”. Dacă nu vezi schimbarea, reîncarcă site-ul." }),
-      el("h3", { text: "Ai greșit ceva?" }),
-      el("p", { text: "Din „Istoric” readuci orice versiune salvată înainte." }),
-    ),
   );
 }
 
@@ -1413,12 +1289,16 @@ function openDialog(title, content) {
     el("div", { class: "dialog-head" }, el("h2", { text: title }), el("button", { type: "button", class: "icon-btn", "aria-label": "Închide", onclick: () => dialog.close() }, "✕")),
     el("div", { class: "dialog-body" }, content),
   );
-  dialog.addEventListener("close", () => dialog.remove());
+  dialog.addEventListener("close", () => {
+    dialog.remove();
+    relayout();
+  });
   dialog.addEventListener("click", (e) => {
     if (e.target === dialog) dialog.close();
   });
-  document.body.append(dialog);
+  UI.append(dialog);
   dialog.showModal();
+  relayout();
   return dialog;
 }
 
@@ -1480,57 +1360,766 @@ async function busy(text, work) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Pornire                                                             */
+/* Editorul de pe pagină: contururi, lupe, fereastra de editare        */
 /* ------------------------------------------------------------------ */
 
-async function start() {
-  try {
-    const res = await fetch("schema.json", { cache: "no-store" });
-    state.schema = await res.json();
-  } catch {
-    $("#main").replaceChildren(el("p", { class: "error card", text: "Nu găsesc admin/schema.json: panoul nu știe ce să arate." }));
-    return;
-  }
-  const schema = state.schema;
-  document.title = `Administrare — ${schema.name}`;
-  $("#site-name").textContent = schema.name;
-  if (schema.accent) document.documentElement.style.setProperty("--accent", schema.accent);
-  const live = $("#live-link");
-  live.href = DEMO ? "../?demo" : schema.liveUrl || "../";
+let host = null; // ține tot editorul, într-un Shadow DOM: stilurile site-ului și ale editorului nu se amestecă
+let layer = null; // stratul cu contururi și lupe, deasupra site-ului
+const spots = [];
+let spotsOn = true;
+let sheet = null; // fereastra de editare deschisă
+let reloading = false;
+let layoutQueued = false;
+let tracking = false;
 
-  $("#save").addEventListener("click", () => save().catch(() => {}));
-  $("#discard").addEventListener("click", discard);
-  $("#reload").addEventListener("click", () => reload().catch(() => {}));
-  $("#history").addEventListener("click", showHistory);
-  $("#maintenance").addEventListener("click", () => showMaintenance().catch(() => {}));
-  $("#help").addEventListener("click", showHelp);
-  $("#logout").addEventListener("click", async () => {
-    if (isDirty() && !(await ask("Ieși?", "Ai modificări nesalvate; se pierd.", "Ieși", true))) return;
-    if (!DEMO) forgetToken();
-    location.href = location.pathname;
-  });
-  window.addEventListener("beforeunload", (e) => {
-    if (isDirty()) e.preventDefault();
-  });
+const OPEN_KEY = "site-edit:open";
+const SCROLL_KEY = "site-edit:scroll";
+const HINT_KEY = "site-edit:hint";
 
-  state.repo = DEMO ? { owner: "demo", name: "site" } : detectRepo(schema);
-  if (DEMO) {
-    document.body.classList.add("is-demo");
-    try {
-      await connect(null);
-    } catch (e) {
-      $("#main").replaceChildren(el("p", { class: "error card", text: e.message }));
+/** Ce vede doar proprietarul, pus peste site: stratul cu lupe, bara de jos, mesajele. */
+function mountUI() {
+  host = document.createElement("div");
+  host.id = "site-editor";
+  UI = host.attachShadow({ mode: "open" });
+  layer = el("div", { class: "layer" });
+  UI.append(
+    el("link", { rel: "stylesheet", href: new URL("admin/edit.css?v=3", SITE_ROOT).href }),
+    layer,
+    el(
+      "div",
+      { class: "bar", id: "bar" },
+      el("button", { type: "button", class: "bar-menu", "aria-label": "Meniu", onclick: showMenu }, el("span", { class: "burger", "aria-hidden": "true" })),
+      el("div", { class: "bar-text" }, el("b", { text: DEMO ? "Editezi (demo)" : "Editezi site-ul" }), el("span", { id: "bar-sub", text: "Atinge lupa de lângă ce vrei să schimbi." })),
+      el("a", { id: "deploy", class: "deploy", target: "_blank", rel: "noopener", hidden: true }),
+      el("button", { type: "button", id: "discard", class: "btn btn-quiet bar-btn", hidden: true, onclick: () => discard() }, "Renunță"),
+      el("button", { type: "button", id: "save", class: "btn btn-primary bar-btn", hidden: true, onclick: () => save().catch(() => {}) }, "Salvează"),
+    ),
+    el("div", { id: "busy", class: "busy", hidden: true }, el("div", { class: "busy-box" }, el("span", { class: "spinner", "aria-hidden": "true" }), el("span", { id: "busy-text" }))),
+    el("div", { id: "toast", class: "toast", role: "status", "aria-live": "polite" }),
+  );
+  // pe pagină: loc pentru bara de jos, ce e ascuns se vede estompat, barele fixe ale site-ului nu încurcă
+  const pageStyle = document.createElement("style");
+  pageStyle.textContent = `
+    body { padding-bottom: calc(84px + env(safe-area-inset-bottom)) !important; }
+    [data-edit-hide] { display: none !important; }
+    .is-hidden-edit { opacity: .42 !important; filter: grayscale(.85); }
+    .se-add-card { list-style: none; display: flex; }
+    .se-add-card > button, button.se-add-card {
+      all: unset; box-sizing: border-box; flex: 1; display: flex; align-items: center; justify-content: center;
+      min-width: 128px; min-height: 64px; padding: 14px 18px; border: 2px dashed var(--se-accent, #6b4a8a);
+      border-radius: 16px; background: color-mix(in srgb, var(--se-accent, #6b4a8a) 7%, transparent);
+      color: var(--se-accent, #6b4a8a); font: 700 15px/1.2 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      text-align: center; cursor: pointer;
     }
-    return;
+    html.se-clean .se-add-card { display: none !important; }
+  `;
+  document.head.append(pageStyle);
+  document.body.append(host);
+}
+
+const editable = () => document.querySelectorAll("[data-edit], [data-edit-add]");
+const findTarget = (path) => document.querySelector(`[data-edit="${CSS.escape(path)}"]`);
+
+/** Cutia în care se poate vedea o bucată (un rând cu derulare laterală o taie la margini). */
+const clipCache = new WeakMap();
+function clipOf(node) {
+  if (clipCache.has(node)) return clipCache.get(node);
+  let p = node.parentElement;
+  let found = null;
+  while (p && p !== document.body) {
+    const s = getComputedStyle(p);
+    if (/(auto|scroll)/.test(s.overflowX + s.overflowY)) {
+      found = p;
+      break;
+    }
+    p = p.parentElement;
   }
-  const token = state.repo ? readToken() : null;
-  if (!token) return renderLogin();
-  try {
-    await connect(token);
-  } catch (e) {
-    if (e.kind === "auth") forgetToken();
-    renderLogin(e.message);
+  clipCache.set(node, found);
+  return found;
+}
+
+function makeSpot() {
+  const spot = { box: el("div", { class: "spot-box", hidden: true }), btn: el("button", { type: "button", class: "spot-btn", hidden: true }), target: null };
+  spot.btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (spot.target) openTarget(spot.target);
+  });
+  layer.append(spot.box, spot.btn);
+  return spot;
+}
+
+function rectOf(t) {
+  const r = t.getBoundingClientRect();
+  let { left, top, right, bottom } = r;
+  const clip = clipOf(t);
+  if (clip) {
+    const c = clip.getBoundingClientRect();
+    left = Math.max(left, c.left);
+    top = Math.max(top, c.top);
+    right = Math.min(right, c.right);
+    bottom = Math.min(bottom, c.bottom);
+  }
+  return { left, top, right, bottom };
+}
+
+/** Pune conturul și lupa peste fiecare bucată editabilă de pe ecran. */
+function layout() {
+  layoutQueued = false;
+  if (!layer) return;
+  const vw = document.documentElement.clientWidth;
+  const vh = innerHeight;
+  const siteDialog = document.querySelector("dialog[open]");
+  let n = 0;
+  const use = () => spots[n] ?? (spots[n] = makeSpot());
+  if (sheet?.target?.isConnected && !siteDialog) {
+    // cât editezi: un singur contur, în jurul bucății la care lucrezi
+    const { left, top, right, bottom } = rectOf(sheet.target);
+    const s = use();
+    n++;
+    s.target = null;
+    s.btn.hidden = true;
+    s.box.hidden = false;
+    s.box.className = "spot-box focus";
+    Object.assign(s.box.style, { left: `${left - 4}px`, top: `${top - 4}px`, width: `${right - left + 8}px`, height: `${bottom - top + 8}px` });
+  } else if (spotsOn && !sheet && !siteDialog && !UI.querySelector("dialog[open]")) {
+    // bara fixă de sus a site-ului acoperă ce trece pe sub ea: acolo nu punem lupe
+    const roof = topBarBottom();
+    for (const t of document.querySelectorAll("[data-edit]")) {
+      let { left, top, right, bottom } = rectOf(t);
+      top = Math.max(top, roof);
+      if (right - left < 6 || bottom - top < 6) continue;
+      if (bottom < roof + 20 || top > vh - 80 || right < 0 || left > vw) continue;
+      const s = use();
+      n++;
+      s.target = t;
+      s.box.hidden = false;
+      s.box.className = `spot-box${t.classList.contains("is-hidden-edit") ? " is-hidden" : ""}`;
+      Object.assign(s.box.style, { left: `${left - 3}px`, top: `${top - 3}px`, width: `${right - left + 6}px`, height: `${bottom - top + 6}px` });
+      s.btn.hidden = false;
+      const bx = Math.min(Math.max(right - 24, 6), vw - 46);
+      const by = Math.min(Math.max(top - 16, roof + 4), vh - 130);
+      s.btn.style.transform = `translate(${Math.round(bx)}px, ${Math.round(by)}px)`;
+    }
+  }
+  for (let i = n; i < spots.length; i++) {
+    spots[i].box.hidden = true;
+    spots[i].btn.hidden = true;
+    spots[i].target = null;
   }
 }
 
-start();
+const relayout = () => {
+  if (layoutQueued) return;
+  layoutQueued = true;
+  requestAnimationFrame(layout);
+};
+
+/** Unde se termină bara fixă de sus a site-ului (antetul cu meniul), dacă are una. */
+let topBar;
+function topBarBottom() {
+  if (topBar === undefined) {
+    topBar = [...document.querySelectorAll("header, [data-edit-top]")].find((h) => /fixed|sticky/.test(getComputedStyle(h).position)) ?? null;
+  }
+  if (!topBar) return 0;
+  const r = topBar.getBoundingClientRect();
+  return r.bottom > 0 && r.top <= 1 ? r.bottom : 0;
+}
+
+/**
+ * „+ Adaugă” stă în rând cu celelalte: un card punctat la capătul fiecărei
+ * liste (rândul de buchete, poveștile, accesoriile…), care se derulează cu ea.
+ */
+function addCards() {
+  for (const list of document.querySelectorAll("[data-edit-add]")) {
+    if (list.querySelector(":scope > .se-add-card")) continue;
+    const label = `+ ${list.dataset.editAddLabel ?? "Adaugă"}`;
+    const inList = /^(UL|OL)$/.test(list.tagName);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = label;
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      addItem(list);
+    });
+    let card = btn;
+    if (inList) {
+      card = document.createElement("li");
+      card.append(btn);
+    }
+    card.classList.add("se-add-card");
+    // comenzile noi apar primele, deci și butonul lor stă primul
+    const def = resolvePath(list.dataset.editAdd)?.def;
+    if (def?.newItemFirst) list.prepend(card);
+    else list.append(card);
+  }
+}
+
+function startTracking() {
+  if (tracking) return;
+  tracking = true;
+  addEventListener("scroll", relayout, { passive: true, capture: true }); // și derularea laterală a rândurilor
+  addEventListener("resize", relayout);
+  setInterval(relayout, 700); // pozele care se încarcă mută lucrurile
+  new MutationObserver(relayout).observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ["open", "hidden"] });
+}
+
+/* ---- unde stă o bucată în conținut ---- */
+
+/**
+ * „gallery/3” → al patrulea element din galerie, „texts/hero.lead” → un text,
+ * „config/delivery/zones/2” → o zonă de livrare. Întoarce câmpurile de arătat
+ * și obiectul pe care îl modifică.
+ */
+function resolvePath(path) {
+  const file = state.files[0];
+  if (!file) return null;
+  const segs = String(path).split("/");
+  let defs = file.def.sections;
+  let obj = file.working;
+  for (let i = 0; i < segs.length; i++) {
+    const def = (defs ?? []).find((d) => d.key === segs[i]);
+    if (!def) return null;
+    const base = segs.slice(0, i).join("/");
+    const here = segs.slice(0, i + 1).join("/");
+    if (def.type === "list") {
+      if (!Array.isArray(obj[def.key])) obj[def.key] = [];
+      const list = obj[def.key];
+      if (i === segs.length - 1) return { title: def.label, fields: [def], obj, base, def, list };
+      const index = Number(segs[++i]);
+      const item = list[index];
+      if (!item || typeof item !== "object") return null;
+      if (i === segs.length - 1) return { title: itemTitle(def, item, index), fields: def.fields ?? [], obj: item, base: `${here}/${index}`, list, index, listDef: def };
+      defs = def.fields;
+      obj = item;
+      continue;
+    }
+    if (def.type === "group") {
+      if (!obj[def.key] || typeof obj[def.key] !== "object") obj[def.key] = {};
+      if (i === segs.length - 1) return { title: def.label, fields: def.fields ?? [], obj: obj[def.key], base: here };
+      defs = def.fields;
+      obj = obj[def.key];
+      continue;
+    }
+    return { title: def.label, fields: [def], obj, base };
+  }
+  return null;
+}
+
+const shortLabel = (s) => String(s ?? "").replace(/\s*\(.*\)$/, "");
+
+function itemTitle(def, item, index) {
+  const key = def.itemTitle;
+  let t = key ? valueAtPath(item, key) : null;
+  const f = (def.fields ?? []).find((x) => x.key === key);
+  const opt = f?.options?.find((o) => String(o.value) === String(t));
+  if (opt) t = opt.label;
+  const name = typeof t === "string" && t.trim() ? t : `nr. ${index + 1}`;
+  return `${shortLabel(def.label)}: ${name}`;
+}
+
+/** Arată pe loc o valoare nouă în pagină, dacă pagina o are legată (data-edit / data-edit-live). */
+function liveUpdate(path, value) {
+  const sel = `[data-edit="${CSS.escape(path)}"], [data-edit-live="${CSS.escape(path)}"]`;
+  const nodes = document.querySelectorAll(sel);
+  if (!nodes.length || (value != null && typeof value === "object")) return false;
+  for (const node of nodes) {
+    if (node.tagName === "IMG") node.src = imageUrl(value);
+    else node.textContent = value ?? "";
+  }
+  showAboveSheet(nodes[0]);
+  relayout();
+  return true;
+}
+
+/** Ce se schimbă trebuie să se vadă: dacă e sub fereastra de editare, pagina urcă până la el. */
+function showAboveSheet(node) {
+  const r = node.getBoundingClientRect();
+  const box = sheet?.box;
+  const bottomFree = box && !box.classList.contains("side") ? box.getBoundingClientRect().top : innerHeight - 90;
+  const topFree = 70;
+  if (r.top >= topFree && r.bottom <= bottomFree - 12) return;
+  const delta = r.bottom > bottomFree - 12 ? r.bottom - (bottomFree - 24) : r.top - topFree - 12;
+  scrollTo({ top: scrollY + delta, behavior: "smooth" });
+}
+
+const snap = (obj) => Object.fromEntries(Object.keys(obj ?? {}).map((k) => [k, JSON.stringify(obj[k])]));
+
+/* ---- fereastra de editare ---- */
+
+function openTarget(t) {
+  if (t.hasAttribute("data-edit-add")) return addItem(t);
+  openSheet(t.dataset.edit, t);
+}
+
+function openSheet(path, target = findTarget(path)) {
+  const r = resolvePath(path);
+  if (!r) return toast("Asta nu se poate schimba de aici.", true);
+  closeSheetNow();
+  const wide = innerWidth >= 900;
+  // pe telefon fereastra stă jos: bucata editată urcă sus, ca schimbarea să se vadă deasupra ei
+  if (target) {
+    const box = target.getBoundingClientRect();
+    if (!wide && (box.top < 64 || box.top > innerHeight * 0.32)) scrollTo({ top: scrollY + box.top - 72, behavior: "instant" });
+    else if (wide && (box.top < 64 || box.bottom > innerHeight - 100)) scrollTo({ top: scrollY + box.top - 120, behavior: "instant" });
+  }
+
+  let prev = snap(r.obj);
+  let structural = false;
+  const onChange = () => {
+    const now = snap(r.obj);
+    for (const k of new Set([...Object.keys(prev), ...Object.keys(now)])) {
+      if (prev[k] === now[k]) continue;
+      if (!liveUpdate(r.base ? `${r.base}/${k}` : k, r.obj[k])) structural = true;
+    }
+    prev = now;
+    saveDraft();
+  };
+
+  const finish = (force = false) => {
+    closeSheetNow();
+    changed();
+    saveDraft();
+    if (structural || force) reloadPage();
+  };
+
+  const actions = [];
+  if (r.list) {
+    const { list, listDef } = r;
+    const item = r.obj;
+    const canHide = (listDef.fields ?? []).some((f) => f.key === "hidden" && f.type === "bool");
+    const fixed = listDef.fixedLength === true;
+    const listPath = path.slice(0, path.lastIndexOf("/"));
+    const siblings = target?.parentElement
+      ? [...target.parentElement.children].filter((c) => c.dataset?.edit?.startsWith(`${listPath}/`) && /^\d+$/.test(c.dataset.edit.slice(listPath.length + 1)))
+      : [];
+    const pos = siblings.indexOf(target);
+    const at = (node) => list[Number(node.dataset.edit.split("/").pop())];
+    const before = pos > 0 ? at(siblings[pos - 1]) : null;
+    const after = pos >= 0 && pos < siblings.length - 1 ? at(siblings[pos + 1]) : null;
+    const move = (other, toAfter) => {
+      list.splice(list.indexOf(item), 1);
+      const i = list.indexOf(other);
+      list.splice(toAfter ? i + 1 : i, 0, item);
+      finish(true);
+    };
+    if (canHide) actions.push(el("button", { type: "button", class: "btn", onclick: () => ((item.hidden = !item.hidden), finish(true)) }, icon(item.hidden ? "eye" : "eye-off"), item.hidden ? "Arată pe site" : "Ascunde"));
+    if (!fixed && before) actions.push(el("button", { type: "button", class: "btn btn-quiet", title: "Mută mai în față", onclick: () => move(before, false) }, "← Mută"));
+    if (!fixed && after) actions.push(el("button", { type: "button", class: "btn btn-quiet", title: "Mută mai în spate", onclick: () => move(after, true) }, "Mută →"));
+    if (!fixed) {
+      actions.push(
+        el("button", {
+          type: "button",
+          class: "btn btn-quiet",
+          onclick: () => {
+            const copy = structuredClone(item);
+            for (const s of (listDef.fields ?? []).filter((f) => f.type === "slug")) copy[s.key] = "";
+            const i = list.indexOf(item) + 1;
+            list.splice(i, 0, copy);
+            closeSheetNow();
+            changed();
+            reloadPage(`${listPath}/${i}`);
+          },
+        }, "Copie"),
+        el("button", {
+          type: "button",
+          class: "btn btn-danger",
+          onclick: async () => {
+            const hint = canHide ? " Dacă doar nu-l mai ai acum, „Ascunde” îl păstrează pentru mai târziu." : "";
+            if (!(await ask("Ștergi?", `Dispare de pe site după ce salvezi.${hint}`, "Șterge", true))) return;
+            list.splice(list.indexOf(item), 1);
+            finish(true);
+          },
+        }, "Șterge"),
+      );
+    }
+  }
+
+  const fields = r.fields.filter((f) => !(r.list && f.key === "hidden" && f.type === "bool"));
+  const scrim = el("div", { class: "scrim", onclick: () => finish() });
+  const box = el(
+    "section",
+    { class: `sheet${wide ? " side" : ""}`, role: "dialog", "aria-modal": "true", "aria-label": r.title },
+    el("div", { class: "sheet-head" }, el("div", { class: "sheet-title" }, el("small", { text: "Schimbi" }), el("h2", { text: r.title })), el("button", { type: "button", class: "icon-btn", "aria-label": "Gata", onclick: () => finish() }, "✕")),
+    el(
+      "div",
+      { class: "sheet-body" },
+      r.list && r.obj.hidden ? el("p", { class: "note", text: "Ascuns: vizitatorii nu-l văd. Tu îl vezi estompat, ca să-l poți arăta iar." }) : null,
+      fieldsForm(fields, r.obj, onChange),
+    ),
+    el("div", { class: "sheet-actions" }, el("div", { class: "sheet-more" }, ...actions), el("button", { type: "button", class: "btn btn-primary sheet-done", onclick: () => finish() }, "Gata")),
+  );
+  sheet = { target, scrim, box, finish };
+  UI.append(scrim, box);
+  layout();
+  requestAnimationFrame(() => box.classList.add("in"));
+}
+
+function closeSheetNow() {
+  if (!sheet) return;
+  sheet.scrim.remove();
+  sheet.box.remove();
+  sheet = null;
+  relayout();
+}
+
+/** „+ Adaugă” de lângă o listă: elementul nou apare unde ai apăsat și se deschide pe loc. */
+function addItem(t) {
+  const key = t.dataset.editAdd;
+  const r = resolvePath(key);
+  if (!r?.def || r.def.type !== "list") return toast("Aici nu se poate adăuga.", true);
+  const def = r.def;
+  const list = r.list;
+  const item = structuredClone(def.newItem ?? {});
+  try {
+    Object.assign(item, JSON.parse(t.dataset.editPreset || "{}"));
+  } catch {}
+  for (const f of (def.fields ?? []).filter((x) => x.type === "date" && x.quickDays && isEmpty(item[x.key]))) item[f.key] = dayFromToday(0);
+  let at = list.length;
+  if (def.newItemFirst) at = 0;
+  else {
+    const last = [...t.querySelectorAll(":scope > [data-edit]")].pop();
+    if (last) at = Number(last.dataset.edit.split("/").pop()) + 1;
+  }
+  list.splice(at, 0, item);
+  changed();
+  reloadPage(`${key}/${at}`);
+}
+
+/* ---- păstrarea modificărilor între reîncărcări ---- */
+
+const draftKey = () => `site-edit:draft:${state.repo.owner}/${state.repo.name}`.toLowerCase();
+
+/** Ce n-ai salvat încă stă în sesiunea browserului, ca pagina să se poată redesena cu el. */
+function saveDraft() {
+  try {
+    if (!isDirty() && !state.pending.size) {
+      sessionStorage.removeItem(draftKey());
+      return true;
+    }
+    sessionStorage.setItem(
+      draftKey(),
+      JSON.stringify({
+        files: state.files.map((f) => ({ path: f.path, sha: f.sha, original: f.original, working: f.working })),
+        pending: [...state.pending].map(([path, img]) => [path, img.value, bytesToBase64(img.bytes), img.type]),
+      }),
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function readDraft() {
+  try {
+    return JSON.parse(sessionStorage.getItem(draftKey()) ?? "null");
+  } catch {
+    return null;
+  }
+}
+
+function clearDraft() {
+  try {
+    sessionStorage.removeItem(draftKey());
+  } catch {}
+}
+
+/** Pagina se redesenează cu ce ai schimbat, în același loc (după adăugat, mutat, ascuns, poze). */
+function reloadPage(openPath) {
+  if (!saveDraft()) {
+    toast("Pozele sunt prea mari ca să le păstrez până la salvare. Apasă „Salvează” acum.", true);
+    return;
+  }
+  try {
+    sessionStorage.setItem(SCROLL_KEY, String(scrollY));
+    if (openPath) sessionStorage.setItem(OPEN_KEY, openPath);
+  } catch {}
+  reloading = true;
+  location.reload();
+}
+
+/* ---- meniul, ieșirea, ajutorul ---- */
+
+function showMenu() {
+  const item = (label, help, fn) =>
+    el("button", { type: "button", class: "menu-item", onclick: () => (dialog.close(), fn()) }, el("b", { text: label }), help ? el("span", { text: help }) : null);
+  const dialog = openDialog(
+    state.schema?.name ?? "Site",
+    el(
+      "div",
+      { class: "menu" },
+      item(spotsOn ? "Ascunde lupele" : "Arată lupele", spotsOn ? "Vezi site-ul curat, ca un vizitator." : "Înapoi la editare.", () => {
+        spotsOn = !spotsOn;
+        document.documentElement.classList.toggle("se-clean", !spotsOn);
+        layout();
+        toast(spotsOn ? "Lupele sunt înapoi." : "Lupele sunt ascunse. Le arăți din meniu (☰).");
+      }),
+      item("Istoric", "Toate salvările. Readuci orice versiune.", showHistory),
+      item("Mentenanță", state.maintenanceOn ? "Pornită: vizitatorii văd doar mesajul." : "Oprită: site-ul merge normal.", () => showMaintenance().catch(() => {})),
+      item("Cum se folosește", null, showHelp),
+      item(IN_APP ? "Închide editarea" : "Ieși din editare", null, exitEdit),
+    ),
+  );
+}
+
+async function exitEdit() {
+  if (isDirty() && !(await ask("Ieși din editare?", "Ai modificări nesalvate; se pierd.", "Ieși", true))) return;
+  clearDraft();
+  reloading = true;
+  if (window.OrganizatorBridge) return window.OrganizatorBridge.postMessage("exit");
+  location.href = location.pathname + (DEMO ? "?demo" : "");
+}
+
+function showHelp() {
+  openDialog(
+    "Cum se folosește",
+    el(
+      "div",
+      { class: "help" },
+      el("h3", { text: "Schimbi ceva" }),
+      el("p", { text: "Lângă tot ce se poate schimba e o lupă. Atinge-o, scrie sau alege, iar pagina arată pe loc cum iese. „Gata” închide fereastra și poți căuta mai departe." }),
+      el("h3", { text: "Pui pe site" }),
+      el("p", { text: "Când ți-a plăcut tot, apasă „Salvează” jos. Vizitatorii văd schimbarea în aproximativ un minut. Până atunci nu se schimbă nimic pentru ei." }),
+      el("h3", { text: "Adaugi un produs" }),
+      el("p", { text: "Lângă fiecare rând e „+ Adaugă”. Apare unul nou chiar acolo: îi pui numele și poza din telefon (o micșorez eu)." }),
+      el("h3", { text: "Nu mai ai ceva" }),
+      el("p", { text: "Atinge lupa și apasă „Ascunde”. Tu îl vezi estompat, vizitatorii deloc, și îl arăți iar când îl ai. „Șterge” îl scoate de tot." }),
+      el("h3", { text: "Ai greșit?" }),
+      el("p", { text: "„Renunță” anulează tot ce n-ai salvat. Din meniu (☰) → Istoric readuci orice versiune salvată înainte." }),
+    ),
+  );
+}
+
+/** Mesajul de mentenanță nu acoperă editarea, dar bara de jos amintește că e pornit. */
+async function loadMaintenanceState() {
+  try {
+    const f = await state.backend.getFile(state.schema.maintenance ?? "maintenance.json");
+    state.maintenanceOn = JSON.parse(fromUtf8.decode(f.bytes)).active === true;
+    changed();
+  } catch {}
+}
+
+/* ---- intrarea ---- */
+
+/** Cheia de acces pusă de aplicația Organizator în „#t=…”: nu pleacă pe internet și o scot imediat din adresă. */
+function tokenFromApp() {
+  const m = /(?:^#|&)t=([^&]+)/.exec(location.hash);
+  if (!m) return null;
+  history.replaceState(null, "", location.pathname + location.search);
+  return decodeURIComponent(m[1]);
+}
+
+function askLogin(error) {
+  return new Promise((resolve) => {
+    const schema = state.schema;
+    const repo = state.repo;
+    const repoText = repo ? `${repo.owner}/${repo.name}` : "";
+    const name = encodeURIComponent(`Editare ${schema.name}`.slice(0, 40));
+    const fineGrained = `https://github.com/settings/personal-access-tokens/new?name=${name}&description=${encodeURIComponent("Cheia pentru editarea site-ului")}${repo ? `&target_name=${encodeURIComponent(repo.owner)}` : ""}&expires_in=none&contents=write`;
+    const classic = `https://github.com/settings/tokens/new?scopes=public_repo&description=${name}`;
+    const tokenInput = el("input", { type: "password", autocomplete: "off", placeholder: "github_pat_… sau ghp_…", "aria-label": "Cheia de acces" });
+    const repoInput = el("input", { type: "text", value: repoText, placeholder: "cont/nume-repo" });
+    const remember = el("input", { type: "checkbox", class: "switch", checked: true });
+    let answered = false;
+    const form = el(
+      "form",
+      {
+        class: "login",
+        onsubmit: (e) => {
+          e.preventDefault();
+          const token = tokenInput.value.trim();
+          const [owner, repoName] = repoInput.value.trim().split("/");
+          if (!owner || !repoName || !token) return;
+          if (`${owner}/${repoName}` !== repoText) {
+            try {
+              localStorage.setItem(repoKey(), `${owner}/${repoName}`);
+            } catch {}
+          }
+          state.repo = { owner, name: repoName };
+          answered = true;
+          dialog.close();
+          resolve({ token, remember: remember.checked });
+        },
+      },
+      el("p", { class: "lead", text: "Ca să schimbi site-ul direct pe pagină, intri o singură dată pe telefonul sau calculatorul ăsta." }),
+      error ? el("p", { class: "error", role: "alert", text: error }) : null,
+      el(
+        "ol",
+        { class: "steps" },
+        el("li", {}, el("b", { text: "Creează o cheie de acces" }), " în contul GitHub în care e site-ul. ", el("a", { href: fineGrained, target: "_blank", rel: "noopener", class: "btn btn-small" }, "Creează cheia ↗")),
+        el("li", {}, "La ", el("b", { text: "Repository access" }), " alege ", el("i", { text: "Only select repositories" }), ` și bifează ${repo?.name ?? "repo-ul site-ului"}; la `, el("b", { text: "Permissions → Contents" }), " alege ", el("i", { text: "Read and write" }), ". Apoi ", el("b", { text: "Generate token" }), "."),
+        el("li", {}, "Copiază cheia (începe cu ", el("code", { text: "github_pat_" }), ") și lipește-o aici."),
+      ),
+      el("label", { class: "field" }, el("span", { class: "field-label", text: "Cheia de acces" }), tokenInput),
+      el("label", { class: "field field-switch" }, el("span", { class: "field-label", text: "Ține-mă minte pe acest dispozitiv" }), remember),
+      el(
+        "details",
+        { class: "advanced" },
+        el("summary", { text: "Altă situație" }),
+        el("label", { class: "field" }, el("span", { class: "field-label", text: "Repo-ul site-ului" }), el("span", { class: "field-help", text: "Se completează singur; schimbă doar dacă site-ul e în alt cont." }), repoInput),
+        el("p", { class: "field-help" }, "Ești doar colaborator la repo? Folosește o ", el("a", { href: classic, target: "_blank", rel: "noopener", text: "cheie clasică cu „public_repo”" }), "."),
+      ),
+      el("button", { type: "submit", class: "btn btn-primary btn-wide" }, "Intră"),
+      el("p", { class: "fine" }, "Cheia rămâne doar în browserul tău și merge doar la GitHub. ", el("a", { href: "?edit&demo", text: "Vreau doar să încerc (demo)" })),
+    );
+    const dialog = openDialog(`Editezi ${schema.name}`, form);
+    // închis fără cheie: site-ul rămâne, doar fără editare
+    dialog.addEventListener("close", () => {
+      if (answered) return;
+      location.href = location.pathname;
+    });
+    tokenInput.focus();
+  });
+}
+
+/** Verifică cheia și citește conținutul (sau ce n-ai salvat încă, din sesiune). */
+async function connect(token) {
+  const backend = DEMO ? new Demo() : new GitHub(token, { ...state.repo, branch: "main" });
+  await busy("Deschid editarea…", async () => {
+    const info = await backend.info();
+    if (!info.permissions?.push) throw new AdminError("Cheia merge, dar nu are voie să schimbe site-ul. Alege „Contents: Read and write” când creezi cheia.", "auth");
+    if (!DEMO) backend.repo.branch = info.default_branch ?? "main";
+    state.backend = backend;
+    state.repo = backend.repo;
+    await loadContent();
+  });
+  checkLastDeploy();
+  loadMaintenanceState();
+}
+
+async function loadContent() {
+  const draft = readDraft();
+  const files = [];
+  for (const def of state.schema.files) {
+    const saved = draft?.files?.find((f) => f.path === def.path);
+    if (saved) {
+      files.push({ def, path: def.path, sha: saved.sha, original: saved.original, working: saved.working });
+      continue;
+    }
+    const file = await state.backend.getFile(def.path);
+    const json = JSON.parse(fromUtf8.decode(file.bytes));
+    files.push({ def, path: def.path, sha: file.sha, original: json, working: structuredClone(json) });
+  }
+  state.files = files;
+  state.pending.clear();
+  for (const [path, value, b64, type] of draft?.pending ?? []) {
+    const bytes = base64ToBytes(b64);
+    const url = URL.createObjectURL(new Blob([bytes], { type }));
+    state.pending.set(path, { bytes, url, value, type });
+    state.previews.set(value, url);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Pornire (o cheamă pagina, cu ?edit în adresă)                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Pune editorul peste site și întoarce conținutul de desenat: cel de pe
+ * GitHub, cu modificările nesalvate deasupra. Null dacă nu se poate edita.
+ */
+export async function start() {
+  mountUI();
+  try {
+    state.schema = await (await fetch(new URL("admin/schema.json", SITE_ROOT), { cache: "no-store" })).json();
+  } catch {
+    toast("Nu găsesc admin/schema.json: nu știu ce se poate schimba pe site.", true);
+    return null;
+  }
+  if (state.schema.accent) {
+    host.style.setProperty("--accent", state.schema.accent);
+    document.documentElement.style.setProperty("--se-accent", state.schema.accent);
+  }
+  state.repo = DEMO ? { owner: "demo", name: "site" } : detectRepo(state.schema);
+
+  const fromApp = DEMO ? null : tokenFromApp();
+  let token = DEMO ? null : fromApp ?? (state.repo ? readToken() : null);
+  if (fromApp) storeToken(fromApp, false);
+  let error = null;
+  for (;;) {
+    if (!DEMO && !token) {
+      const login = await askLogin(error);
+      token = login.token;
+      try {
+        await connect(token);
+        storeToken(token, login.remember);
+        break;
+      } catch (e) {
+        error = e.message;
+        token = null;
+        continue;
+      }
+    }
+    try {
+      await connect(token);
+      break;
+    } catch (e) {
+      if (DEMO) {
+        toast(e.message, true);
+        return null;
+      }
+      if (e.kind === "auth") forgetToken();
+      error = e.message;
+      token = null;
+    }
+  }
+
+  // pozele alese acum, dar încă nepublicate pe site: le iau din repo până apar
+  document.addEventListener(
+    "error",
+    (e) => {
+      const img = e.target;
+      if (!(img instanceof HTMLImageElement) || img.dataset.raw || DEMO) return;
+      const path = repoPathFor(img.getAttribute("src"));
+      if (!path) return;
+      img.dataset.raw = "1";
+      img.src = `https://raw.githubusercontent.com/${state.repo.owner}/${state.repo.name}/${state.repo.branch}/${path}`;
+    },
+    true,
+  );
+  addEventListener("beforeunload", (e) => {
+    if (!reloading && isDirty()) e.preventDefault();
+  });
+  addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && sheet) sheet.finish();
+  });
+  // aplicația Organizator întreabă asta înainte să închidă editarea
+  window.siteEditor = { dirty: () => isDirty() || state.pending.size > 0 };
+  changed();
+  const main = state.files.find((f) => f.path === "content.json") ?? state.files[0];
+  return main?.working ?? null;
+}
+
+/** Pagina a desenat conținutul: pun lupele, pozele noi, locul de unde erai. */
+export function rendered() {
+  for (const img of document.querySelectorAll("img[src]")) {
+    const v = img.getAttribute("src");
+    if (state.previews.has(v)) img.src = state.previews.get(v);
+  }
+  const texts = state.files[0]?.def.sections.find((s) => s.key === "texts");
+  const keys = new Set((texts?.fields ?? []).map((f) => f.key));
+  for (const t of document.querySelectorAll("[data-text]")) {
+    if (keys.has(t.dataset.text) && !t.dataset.edit) t.dataset.edit = `texts/${t.dataset.text}`;
+  }
+  let open = null;
+  try {
+    const y = sessionStorage.getItem(SCROLL_KEY);
+    sessionStorage.removeItem(SCROLL_KEY);
+    if (y != null) scrollTo({ top: Number(y), behavior: "instant" });
+    open = sessionStorage.getItem(OPEN_KEY);
+    sessionStorage.removeItem(OPEN_KEY);
+  } catch {}
+  addCards();
+  startTracking();
+  layout();
+  if (open) {
+    setTimeout(() => openSheet(open), 150);
+    return;
+  }
+  let seen = false;
+  try {
+    seen = sessionStorage.getItem(HINT_KEY) === "1";
+    sessionStorage.setItem(HINT_KEY, "1");
+  } catch {}
+  if (!seen) toast("Atinge lupa de lângă orice vrei să schimbi.");
+}
