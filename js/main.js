@@ -15,7 +15,7 @@
   let CONTENT;
   if (EDIT) {
     try {
-      EDITOR = await import(new URL("admin/edit.js?v=3", document.baseURI).href);
+      EDITOR = await import(new URL("admin/edit.js?v=4", document.baseURI).href);
       CONTENT = await EDITOR.start();
     } catch (err) {
       console.error("Editarea nu a pornit", err);

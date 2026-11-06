@@ -145,7 +145,7 @@ class GitHub {
     } catch {}
     switch (res.status) {
       case 401:
-        throw new AdminError("Cheia de acces nu mai e bună (a expirat sau a fost ștearsă). Apasă „Ieși” și intră cu o cheie nouă.", "auth");
+        throw new AdminError("Cheia de acces nu mai e bună (a expirat sau a fost ștearsă). Pune o cheie nouă.", "auth");
       case 403:
         if (res.headers.get("x-ratelimit-remaining") === "0") {
           throw new AdminError("GitHub cere o pauză (prea multe cereri). Mai încearcă peste câteva minute.");
