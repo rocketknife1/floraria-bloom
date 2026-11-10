@@ -40,6 +40,7 @@ Vrei doar să încerci, fără să salvezi nimic? **https://rocketknife1.github.
 - Camera plantelor: temperaturi și umiditate pe tipuri de plante, cu termometru interactiv.
 - Program cu stare live („Deschis acum” / „Închis”), hartă Google cu adresa.
 - Comandă pe WhatsApp, doar cu atingeri, și „Ce pregătim acum”.
+- Fundal ilustrat discret: câte un desen floral cu linie subțire pe secțiunile deschise (`img/decor/`).
 - Responsive, cu bară de contact rapid pe mobil; respectă setarea „reduce motion”.
 - Politică de confidențialitate, linkuri ANPC / SAL, date structurate schema.org (`Florist`).
 

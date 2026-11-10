@@ -2,6 +2,8 @@
 
 Fotografiile cu buchete, cutii și coșuri (buchet-*, cos-*, cutie-*, trandafiri-rosii, bloom-coperta) sunt lucrări reale ale florăriei.
 
+Desenele de fundal din `decor/` (eucalipt, lalea, bujor, măslin, lotus) sunt făcute special pentru site, în culorile lui, și aparțin site-ului.
+
 Fotografiile de mai jos sunt **ilustrative**, de pe Unsplash (licență Unsplash: uz comercial permis, fără atribuire obligatorie). Se pot înlocui oricând cu poze din florărie.
 
 | Fișier | Sursă |

@@ -941,3 +941,52 @@ textarea.pick-text { resize: vertical; margin-top: 10px; }
 .live-item[data-state="gata"] em { color: #1e7f4f; background: #e3f5ea; }
 .live-item[data-state="cerere"] em::before, .live-item[data-state="gata"] em::before { animation: none; background: currentColor; }
 .live-list .live-empty { padding: 18px; border-radius: 14px; background: #fff; color: var(--ink-soft); text-align: center; }
+
+/* Fundal ilustrat: pe secțiunile deschise, câte un desen cu linie subțire
+   (eucalipt, lalea, bujor, măslin, lotusul din siglă), ieșit din margine,
+   cu o pată de culoare difuză în spate. Unul singur pe secțiune. */
+:root {
+  --glow-rose: radial-gradient(closest-side, rgba(226, 195, 211, .5), rgba(226, 195, 211, 0));
+  --glow-lilac: radial-gradient(closest-side, rgba(211, 200, 227, .6), rgba(211, 200, 227, 0));
+}
+#flori {
+  background:
+    url("../img/decor/maslin.svg") right -30px top 22px / clamp(220px, 26vw, 380px) auto no-repeat,
+    var(--glow-rose) right -220px top -160px / 680px 680px no-repeat;
+}
+#accesorii {
+  background:
+    url("../img/decor/lalea.svg") right 3% top 34px / clamp(90px, 11vw, 160px) auto no-repeat,
+    var(--glow-lilac) right -160px top -120px / 560px 560px no-repeat;
+}
+#harta {
+  background:
+    url("../img/decor/eucalipt.svg") right -30px top 0 / clamp(150px, 20vw, 290px) auto no-repeat,
+    var(--glow-rose) right -200px top -220px / 640px 640px no-repeat,
+    var(--mist);
+}
+#cum-comanzi {
+  background:
+    url("../img/decor/bujor.svg") right 2% top 26px / clamp(120px, 15vw, 220px) auto no-repeat,
+    var(--glow-rose) right -140px top -160px / 560px 560px no-repeat;
+}
+#comanda {
+  background:
+    url("../img/decor/eucalipt.svg") left -60px bottom -40px / clamp(150px, 20vw, 300px) auto no-repeat,
+    radial-gradient(closest-side, rgba(248, 247, 250, .55), rgba(248, 247, 250, 0)) left -200px bottom -200px / 640px 640px no-repeat,
+    linear-gradient(180deg, var(--lilac), var(--lilac-deep));
+}
+#contact {
+  background:
+    url("../img/decor/lotus.svg") right 4% top 30px / clamp(120px, 15vw, 220px) auto no-repeat,
+    var(--glow-lilac) right -160px top -160px / 620px 620px no-repeat;
+}
+@media (max-width: 760px) {
+  /* pe telefon desenele stau mai mici și mai ieșite din ecran, ca să nu treacă prin text */
+  #flori { background-position: right -90px top 6px, right -260px top -220px; background-size: 210px auto, 520px 520px; }
+  #accesorii { background-position: right -18px top 12px, right -200px top -160px; background-size: 74px auto, 420px 420px; }
+  #harta { background-position: right -44px top 0, right -220px top -240px, 0 0; background-size: 120px auto, 480px 480px, auto; }
+  #cum-comanzi { background-position: right -26px top 14px, right -200px top -200px; background-size: 112px auto, 420px 420px; }
+  #comanda { background-position: left -70px bottom -30px, left -220px bottom -220px, 0 0; background-size: 150px auto, 480px 480px, auto; }
+  #contact { background-position: right -20px top 14px, right -200px top -200px; background-size: 110px auto, 460px 460px; }
+}
