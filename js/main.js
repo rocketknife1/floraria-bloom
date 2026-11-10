@@ -1,7 +1,7 @@
 (async () => {
   /* ------------------------------------------------------------------
    * CONTENT lives in content.json, so it can be edited without touching
-   * code (e.g. from the Organizator app, which commits that file):
+   * code (with the in-page editor, ?edit, which commits that file):
    *  - config: program, livrare, telefon WhatsApp. Valorile sunt ORIENTATIVE
    *    până le confirmă florăria (draft: true afișează „de confirmat”).
    *    km / min vin din traseele reale din js/routes.js, nu se editează.
@@ -15,7 +15,7 @@
   let CONTENT;
   if (EDIT) {
     try {
-      EDITOR = await import(new URL("admin/edit.js?v=4", document.baseURI).href);
+      EDITOR = await import(new URL("admin/edit.js?v=5", document.baseURI).href);
       CONTENT = await EDITOR.start();
     } catch (err) {
       console.error("Editarea nu a pornit", err);
@@ -124,6 +124,35 @@
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") setMenu(false); });
 
   if (CONFIG.phoneWa) $$('a[href="https://wa.me/"]').forEach((a) => { a.href = `https://wa.me/${CONFIG.phoneWa}`; });
+
+  /* Telefonul, adresa și paginile de Facebook / Instagram vin din content.json
+   * (config), ca proprietarul să le poată schimba singur. Fără telefon scris,
+   * rămâne „0723 ••• •••”. Datele pentru Google (JSON-LD) se țin la zi. */
+  const telHref = (p) => `tel:${String(p).replace(/[^\d+]/g, "").replace(/^0/, "+40")}`;
+  if (CONFIG.phone) {
+    $$("[data-phone]").forEach((a) => { a.textContent = CONFIG.phone; a.href = telHref(CONFIG.phone); });
+    $$("[data-phone-call]").forEach((a) => { a.href = telHref(CONFIG.phone); });
+  }
+  if (CONFIG.address) $$("[data-address]").forEach((el) => { el.textContent = CONFIG.address; });
+  if (CONFIG.city) $$("[data-city]").forEach((el) => { el.textContent = CONFIG.city; });
+  if (CONFIG.facebook) $$("[data-facebook]").forEach((a) => { a.href = CONFIG.facebook; });
+  if (CONFIG.facebookName) $$("[data-facebook][data-edit-live]").forEach((a) => { a.textContent = CONFIG.facebookName; });
+  const insta = String(CONFIG.instagram ?? "").trim().replace(/^@/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/.*$/, "");
+  if (insta) {
+    $$("[data-instagram], [data-instagram-link]").forEach((a) => { a.href = `https://www.instagram.com/${insta}/`; });
+    $$("[data-instagram]").forEach((a) => { a.textContent = `@${insta}`; });
+  }
+  const ld = $('script[type="application/ld+json"]');
+  if (ld) {
+    try {
+      const data = JSON.parse(ld.textContent);
+      if (CONFIG.phone) data.telephone = CONFIG.phone;
+      if (CONFIG.address && data.address) data.address.streetAddress = CONFIG.address;
+      if (CONFIG.city && data.address) data.address.addressLocality = CONFIG.city;
+      data.sameAs = [CONFIG.facebook, insta && `https://www.instagram.com/${insta}/`].filter(Boolean);
+      ld.textContent = JSON.stringify(data);
+    } catch {}
+  }
 
   /* Open / closed status, from CONFIG.hours */
   function shopStatus(now = new Date()) {

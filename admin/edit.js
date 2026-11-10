@@ -12,15 +12,15 @@
  *
  * „Salvează” face un commit în repo-ul de pe GitHub, iar GitHub Pages publică
  * singur în aproximativ un minut. Fără server: editorul vorbește direct cu
- * GitHub, cu cheia celui care administrează (în aplicația Organizator vine
- * singură). Cu „?edit&demo” merge fără cheie și nu salvează nimic.
+ * GitHub, cu cheia celui care administrează, ținută doar în browserul lui.
+ * Cu „?edit&demo” merge fără cheie și nu salvează nimic.
  */
 
 const API = "https://api.github.com";
 const DEMO = new URLSearchParams(location.search).has("demo");
 const SITE_ROOT = new URL("./", location.href);
-/** Deschis din aplicația Organizator (WebView-ul ei are puntea asta). */
-const IN_APP = "OrganizatorBridge" in window;
+/** Deschis dintr-o aplicație de telefon care are puntea asta (opțional; în browser lipsește). */
+const IN_APP = "AppBridge" in window;
 const DAYS = ["Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă", "Duminică"];
 const DAYS_SHORT = ["L", "Ma", "Mi", "J", "V", "S", "D"];
 
@@ -72,7 +72,7 @@ function base64ToBytes(b64) {
   return out;
 }
 
-/** „Munții Parâng” → „muntii-parang”, la fel ca în Organizator. */
+/** „Munții Parâng” → „muntii-parang”. */
 function slugify(input) {
   const map = { ă: "a", â: "a", î: "i", ș: "s", ş: "s", ț: "t", ţ: "t", á: "a", à: "a", ä: "a", é: "e", è: "e", ë: "e", í: "i", ó: "o", ö: "o", ő: "o", ú: "u", ü: "u", ű: "u", ç: "c" };
   return String(input)
@@ -155,7 +155,7 @@ class GitHub {
         throw new AdminError(`Nu găsesc site-ul pe GitHub (${detail || "repo sau fișier lipsă"}). Verifică dacă cheia are acces la repo-ul lui.`, "missing");
       case 409:
       case 422:
-        throw new AdminError("Site-ul s-a schimbat între timp (poate din Organizator sau de pe alt telefon). Apasă „Reîncarcă”, ca să nu scrii peste modificarea aceea.", "conflict");
+        throw new AdminError("Site-ul s-a schimbat între timp (poate de pe alt telefon sau calculator). Reîncarcă pagina, ca să nu scrii peste modificarea aceea.", "conflict");
       default:
         throw new AdminError(`GitHub a răspuns cu eroarea ${res.status}. ${detail}`);
     }
@@ -190,7 +190,7 @@ class GitHub {
     const headCommit = await this.send("GET", this.path(`git/commits/${headSha}`));
     for (const [path, sha] of Object.entries(expected)) {
       if ((await this.getFile(path, headSha)).sha !== sha) {
-        throw new AdminError("Site-ul s-a schimbat între timp (poate din Organizator sau de pe alt telefon). Apasă „Reîncarcă”, ca să nu scrii peste modificarea aceea.", "conflict");
+        throw new AdminError("Site-ul s-a schimbat între timp (poate de pe alt telefon sau calculator). Reîncarcă pagina, ca să nu scrii peste modificarea aceea.", "conflict");
       }
     }
     const tree = [];
@@ -366,7 +366,7 @@ function detectRepo(schema) {
   return null;
 }
 
-/* Calea pozelor: ce se scrie în JSON și unde stă fișierul în repo (ca în Organizator). */
+/* Calea pozelor: ce se scrie în JSON și unde stă fișierul în repo. */
 const trimSlashes = (s) => String(s ?? "").replace(/^\/+|\/+$/g, "");
 const imageDir = () => trimSlashes(state.schema.imageDir ?? "images");
 const imagePublic = () => state.schema.imagePublicPath ?? imageDir();
@@ -1383,7 +1383,7 @@ function mountUI() {
   UI = host.attachShadow({ mode: "open" });
   layer = el("div", { class: "layer" });
   UI.append(
-    el("link", { rel: "stylesheet", href: new URL("admin/edit.css?v=3", SITE_ROOT).href }),
+    el("link", { rel: "stylesheet", href: new URL("admin/edit.css?v=4", SITE_ROOT).href }),
     layer,
     el(
       "div",
@@ -1735,12 +1735,15 @@ function openSheet(path, target = findTarget(path)) {
     }
   }
 
-  const fields = r.fields.filter((f) => !(r.list && f.key === "hidden" && f.type === "bool"));
+  // data-edit-fields: doar câmpurile care contează acolo (la telefon: telefonul și WhatsApp-ul)
+  const only = target?.dataset.editFields?.split(",").map((k) => k.trim()).filter(Boolean);
+  const title = target?.dataset.editTitle ?? r.title;
+  const fields = r.fields.filter((f) => !(r.list && f.key === "hidden" && f.type === "bool") && (!only || only.includes(f.key)));
   const scrim = el("div", { class: "scrim", onclick: () => finish() });
   const box = el(
     "section",
-    { class: `sheet${wide ? " side" : ""}`, role: "dialog", "aria-modal": "true", "aria-label": r.title },
-    el("div", { class: "sheet-head" }, el("div", { class: "sheet-title" }, el("small", { text: "Schimbi" }), el("h2", { text: r.title })), el("button", { type: "button", class: "icon-btn", "aria-label": "Gata", onclick: () => finish() }, "✕")),
+    { class: `sheet${wide ? " side" : ""}`, role: "dialog", "aria-modal": "true", "aria-label": title },
+    el("div", { class: "sheet-head" }, el("div", { class: "sheet-title" }, el("small", { text: "Schimbi" }), el("h2", { text: title })), el("button", { type: "button", class: "icon-btn", "aria-label": "Gata", onclick: () => finish() }, "✕")),
     el(
       "div",
       { class: "sheet-body" },
@@ -1866,7 +1869,7 @@ async function exitEdit() {
   if (isDirty() && !(await ask("Ieși din editare?", "Ai modificări nesalvate; se pierd.", "Ieși", true))) return;
   clearDraft();
   reloading = true;
-  if (window.OrganizatorBridge) return window.OrganizatorBridge.postMessage("exit");
+  if (window.AppBridge) return window.AppBridge.postMessage("exit");
   location.href = location.pathname + (DEMO ? "?demo" : "");
 }
 
@@ -1901,7 +1904,7 @@ async function loadMaintenanceState() {
 
 /* ---- intrarea ---- */
 
-/** Cheia de acces pusă de aplicația Organizator în „#t=…”: nu pleacă pe internet și o scot imediat din adresă. */
+/** Cheia de acces trimisă de o aplicație în „#t=…” (opțional): nu pleacă pe internet și o scot imediat din adresă. */
 function tokenFromApp() {
   const m = /(?:^#|&)t=([^&]+)/.exec(location.hash);
   if (!m) return null;
@@ -2083,7 +2086,7 @@ export async function start() {
   addEventListener("keydown", (e) => {
     if (e.key === "Escape" && sheet) sheet.finish();
   });
-  // aplicația Organizator întreabă asta înainte să închidă editarea
+  // o aplicație care deschide editorul poate întreba asta înainte să-l închidă
   window.siteEditor = { dirty: () => isDirty() || state.pending.size > 0 };
   changed();
   const main = state.files.find((f) => f.path === "content.json") ?? state.files[0];

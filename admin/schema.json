@@ -324,13 +324,45 @@
               "type": "bool"
             },
             {
+              "key": "phone",
+              "label": "Telefon (cum apare pe site, ex. 0723 123 456)",
+              "type": "text",
+              "description": "Gol: pe site apare „0723 ••• •••”, ascuns."
+            },
+            {
               "key": "phoneWa",
               "label": "Număr WhatsApp (ex. 40723123456, fără +)",
+              "type": "text",
+              "description": "Aici ajung mesajele trimise din formularul de comandă."
+            },
+            {
+              "key": "address",
+              "label": "Adresa (stradă, număr, bloc)",
+              "type": "text"
+            },
+            {
+              "key": "city",
+              "label": "Orașul",
+              "type": "text"
+            },
+            {
+              "key": "facebook",
+              "label": "Pagina de Facebook (linkul)",
+              "type": "text"
+            },
+            {
+              "key": "facebookName",
+              "label": "Numele paginii de Facebook",
+              "type": "text"
+            },
+            {
+              "key": "instagram",
+              "label": "Contul de Instagram (ex. florariabloompetrosani)",
               "type": "text"
             },
             {
               "key": "mapsQuery",
-              "label": "Adresa căutată pe Google Maps",
+              "label": "Adresa căutată pe hartă (Google Maps)",
               "type": "text"
             },
             {
@@ -570,6 +602,11 @@
               "key": "hero.lead",
               "label": "Textul de prezentare de sus",
               "type": "longtext"
+            },
+            {
+              "key": "facts.followers",
+              "label": "Câți oameni vă urmăresc (ex. 2.300+ oameni)",
+              "type": "text"
             },
             {
               "key": "stories.title",

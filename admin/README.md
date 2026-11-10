@@ -2,14 +2,13 @@
 
 Proprietarul își vede **site-ul real**. Lângă tot ce se poate schimba apare un contur punctat și o **lupă**. Atinge lupa, schimbă textul, poza, prețul sau programul, iar pagina arată **pe loc** cum iese. „Gata” închide fereastra și poate căuta mai departe. La final apasă **„Salvează”** (jos), iar vizitatorii văd noua variantă în aproximativ un minut.
 
-- **Din aplicația Organizator:** Site-uri → Florăria Bloom → **Editează site-ul**. Se deschide direct, fără logare (folosește tokenul din Setări).
-- **Din browser:** https://rocketknife1.github.io/floraria-bloom/?edit (prima dată cere cheia de acces, vezi mai jos).
+- **Adresa:** https://rocketknife1.github.io/floraria-bloom/?edit (prima dată cere cheia de acces, vezi mai jos). Merge din orice browser, pe telefon sau calculator.
 - **Demo:** `…/?edit&demo` merge fără cheie și nu salvează nimic.
 - Adresa veche `…/admin/` duce acum tot aici.
 
 ## Ce se poate face
 
-- **Texte, poze, prețuri, program, zone de livrare:** lupa de lângă ele.
+- **Texte, poze, prețuri, program, zone de livrare, telefon, WhatsApp, adresă, Facebook, Instagram:** lupa de lângă ele. La telefon, adresă și rețele, fereastra arată doar câmpurile de acolo (`data-edit-fields`).
 - **Produse noi:** la capătul fiecărui rând (buchete, cutii, coșuri, povești, accesorii, plante) e un card „+ Adaugă”. Apare unul nou chiar acolo și se deschide pe loc.
 - **Nu mai ai ceva:** lupa → „Ascunde”. Tu îl vezi estompat, vizitatorii deloc, iar „Arată pe site” îl readuce. „Șterge” îl scoate de tot.
 - **Ordinea:** lupa → „← Mută” / „Mută →”.
@@ -24,7 +23,7 @@ Proprietarul își vede **site-ul real**. Lângă tot ce se poate schimba apare 
 - Pagina își marchează bucățile: `data-edit="gallery/3"` (al patrulea produs), `data-edit="config/hours"` (programul), textele cu `data-text`. Liste: `data-edit-add="gallery"`. Toate acestea le pune `js/main.js` doar când adresa are `?edit`, deci vizitatorii nu le primesc.
 - `admin/edit.js` + `admin/edit.css` sunt editorul. Stă într-un Shadow DOM peste pagină, ca stilurile lui și ale site-ului să nu se amestece. Se încarcă doar cu `?edit`.
 - „Salvează” face un commit în repo prin API-ul GitHub (conținutul și pozele noi, micșorate automat, într-un singur commit). GitHub Pages publică singur în aproximativ un minut, iar bara de jos arată „Se publică…”, apoi „Pe site”.
-- Nu există server. Editorul vorbește direct cu GitHub, cu o cheie de acces pusă o singură dată pe dispozitiv; cheia rămâne doar în browser. Aplicația Organizator o trimite în `#t=…` (partea de după `#` nu pleacă pe internet), iar editorul o scoate imediat din adresă.
+- Nu există server. Editorul vorbește direct cu GitHub, cu o cheie de acces pusă o singură dată pe dispozitiv; cheia rămâne doar în browser. Opțional, o aplicație care deschide editorul poate trimite cheia în `#t=…` (partea de după `#` nu pleacă pe internet), iar editorul o scoate imediat din adresă.
 - Dacă site-ul s-a schimbat între timp din altă parte, editorul nu scrie peste: cere să reîncarci.
 
 ## Cheia de acces (o singură dată pe fiecare telefon sau calculator, doar în browser)

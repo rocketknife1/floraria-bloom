@@ -1,6 +1,6 @@
 /* Maintenance mode: if maintenance.json says "active": true, a full-screen
- * message covers the site. The file is switched on/off from the Organizator
- * app (tab "Site-uri"), so no code change is needed to take the site down.
+ * message covers the site. The file is switched on/off from the in-page editor
+ * (?edit → ☰ → Mentenanță), so no code change is needed to take the site down.
  * Colours and font come from data-* attributes on the <script> tag, so each
  * site keeps its own look. */
 (async () => {

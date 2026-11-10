@@ -38,11 +38,18 @@
     "live.title": "Ce pregătim acum",
     "live.text": "Comenzile la care lucrăm în florărie chiar acum. Fără nume: doar ce, pentru când și unde ajung.",
     "contact.title": "Vino la florărie",
-    "footer.tag": "o floare, un zâmbet"
+    "footer.tag": "o floare, un zâmbet",
+    "facts.followers": "2.300+ oameni"
   },
   "config": {
     "draft": true,
     "phoneWa": "",
+    "phone": "",
+    "address": "Str. 1 Decembrie 1918, bl. 65, parter",
+    "city": "Petroșani",
+    "facebook": "https://www.facebook.com/p/Floraria-Bloom-Petrosani-100063499634388/",
+    "facebookName": "Florăria Bloom Petroșani",
+    "instagram": "florariabloompetrosani",
     "mapsQuery": "Florăria Bloom, Strada 1 Decembrie 1918, bl. 65, Petroșani",
     "hours": {
       "0": null,
@@ -441,7 +448,7 @@
     },
     {
       "id": "verzi",
-      "tab": "Plante mov",
+      "tab": "Plante verzi",
       "img": "img/zona-verzi.jpg",
       "alt": "Palmier și plante verzi în ghivece",
       "title": "Echilibru pentru plantele verzi de interior",

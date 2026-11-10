@@ -61,7 +61,7 @@
         <a href="#livrare">Livrare</a>
         <a href="#comanda">Comandă</a>
         <a href="#contact">Florăria</a>
-        <a class="nav-call" href="#contact">0723 <span class="redact" aria-hidden="true">000 000</span></a>
+        <a class="nav-call" href="#contact" data-phone data-edit-live="config/phone">0723 <span class="redact" aria-hidden="true">000 000</span></a>
       </nav>
     </div>
   </header>
@@ -95,10 +95,10 @@
 
     <section class="facts" aria-label="Pe scurt">
       <div class="wrap facts-inner">
-        <p><strong>Ne găsești</strong> pe Str. 1 Decembrie 1918, bl. 65, parter, Petroșani</p>
+        <p data-edit="config" data-edit-fields="address,city,mapsQuery" data-edit-title="Adresa florăriei"><strong>Ne găsești</strong> pe <span data-address data-edit-live="config/address">Str. 1 Decembrie 1918, bl. 65, parter</span>, <span data-city data-edit-live="config/city">Petroșani</span></p>
         <p><strong>Livrăm cu mașina noastră</strong> în toată Valea Jiului, <a href="#harta">vezi traseul până la tine</a></p>
-        <p><strong>Comenzi</strong> la telefon sau pe WhatsApp: <a href="#contact">0723 <span class="redact" aria-hidden="true">000 000</span></a></p>
-        <p><strong>2.300+ oameni</strong> ne urmăresc lucrările pe <a href="https://www.facebook.com/p/Floraria-Bloom-Petrosani-100063499634388/" target="_blank" rel="noopener">Facebook</a></p>
+        <p data-edit="config" data-edit-fields="phone,phoneWa" data-edit-title="Telefon și WhatsApp"><strong>Comenzi</strong> la telefon sau pe WhatsApp: <a href="#contact" data-phone data-edit-live="config/phone">0723 <span class="redact" aria-hidden="true">000 000</span></a></p>
+        <p><strong data-text="facts.followers">2.300+ oameni</strong> ne urmăresc lucrările pe <a href="https://www.facebook.com/p/Floraria-Bloom-Petrosani-100063499634388/" target="_blank" rel="noopener" data-facebook>Facebook</a></p>
       </div>
     </section>
 
@@ -107,7 +107,7 @@
       <div class="wrap">
         <div class="stories-head">
           <h2 id="povesti-titlu" data-text="stories.title">Din florărie, săptămâna asta</h2>
-          <p>Apasă pe un cerc și răsfoiește lucrările. Mai multe pe <a href="https://www.instagram.com/florariabloompetrosani/" target="_blank" rel="noopener">Instagram</a>.</p>
+          <p>Apasă pe un cerc și răsfoiește lucrările. Mai multe pe <a href="https://www.instagram.com/florariabloompetrosani/" target="_blank" rel="noopener" data-instagram-link>Instagram</a>.</p>
         </div>
         <ul class="stories" aria-label="Povești din florărie" data-story-rings></ul>
       </div>
@@ -354,7 +354,7 @@
         <div class="order-intro">
           <h2 id="comanda-titlu" data-text="order.title">Comandă flori</h2>
           <p data-text="order.text">Apeși pe ce îți trebuie, iar la final se deschide WhatsApp cu mesajul gata scris. Noi îți răspundem cu propunerea și prețul.</p>
-          <p>Preferi să vorbim direct? Sună la <a href="#contact">0723 <span class="redact" aria-hidden="true">000 000</span></a>.</p>
+          <p data-edit="config" data-edit-fields="phone,phoneWa" data-edit-title="Telefon și WhatsApp">Preferi să vorbim direct? Sună la <a href="#contact" data-phone data-edit-live="config/phone">0723 <span class="redact" aria-hidden="true">000 000</span></a>.</p>
           <p class="fine">Datele din formular nu sunt salvate pe site. Ajung doar în mesajul de WhatsApp pe care îl trimiți tu. Detalii în <a href="politica-de-confidentialitate.html">politica de confidențialitate</a>.</p>
         </div>
 
@@ -431,19 +431,19 @@
           <dl>
             <div>
               <dt>Adresă</dt>
-              <dd>Str. 1 Decembrie 1918, bl. 65, parter<br>Petroșani, jud. Hunedoara</dd>
+              <dd data-edit="config" data-edit-fields="address,city,mapsQuery" data-edit-title="Adresa florăriei"><span data-address data-edit-live="config/address">Str. 1 Decembrie 1918, bl. 65, parter</span><br><span data-city data-edit-live="config/city">Petroșani</span>, jud. Hunedoara</dd>
             </div>
             <div>
               <dt>Telefon și WhatsApp</dt>
-              <dd><a href="#contact">0723 <span class="redact" aria-hidden="true">000 000</span></a></dd>
+              <dd data-edit="config" data-edit-fields="phone,phoneWa" data-edit-title="Telefon și WhatsApp"><a href="#contact" data-phone data-edit-live="config/phone">0723 <span class="redact" aria-hidden="true">000 000</span></a></dd>
             </div>
             <div>
               <dt>Facebook</dt>
-              <dd><a href="https://www.facebook.com/p/Floraria-Bloom-Petrosani-100063499634388/" target="_blank" rel="noopener">Florăria Bloom Petroșani</a></dd>
+              <dd data-edit="config" data-edit-fields="facebook,facebookName,instagram" data-edit-title="Facebook și Instagram"><a href="https://www.facebook.com/p/Floraria-Bloom-Petrosani-100063499634388/" target="_blank" rel="noopener" data-facebook data-edit-live="config/facebookName">Florăria Bloom Petroșani</a></dd>
             </div>
             <div>
               <dt>Instagram</dt>
-              <dd><a href="https://www.instagram.com/florariabloompetrosani/" target="_blank" rel="noopener">@florariabloompetrosani</a></dd>
+              <dd data-edit="config" data-edit-fields="facebook,facebookName,instagram" data-edit-title="Facebook și Instagram"><a href="https://www.instagram.com/florariabloompetrosani/" target="_blank" rel="noopener" data-instagram>@florariabloompetrosani</a></dd>
             </div>
           </dl>
           <div class="hours">
@@ -479,7 +479,7 @@
   </footer>
 
   <div class="mobile-bar" aria-label="Contact rapid" data-edit-hide>
-    <a href="#contact">Sună</a>
+    <a href="#contact" data-phone-call>Sună</a>
     <a href="https://wa.me/" rel="noopener" target="_blank">WhatsApp</a>
     <a href="#comanda" class="mobile-bar-main">Comandă</a>
   </div>
@@ -522,7 +522,7 @@
     </div>
   </dialog>
 
-  <script src="maintenance.js?v=2" defer data-brand="Florăria Bloom" data-bg="#261E33" data-fg="#F8F7FA" data-accent="#CFA021" data-font="Jost, system-ui, sans-serif" data-display="Marcellus, Georgia, serif"></script>
-  <script src="js/main.js?v=19" defer></script>
+  <script src="maintenance.js?v=3" defer data-brand="Florăria Bloom" data-bg="#261E33" data-fg="#F8F7FA" data-accent="#CFA021" data-font="Jost, system-ui, sans-serif" data-display="Marcellus, Georgia, serif"></script>
+  <script src="js/main.js?v=20" defer></script>
 </body>
 </html>
